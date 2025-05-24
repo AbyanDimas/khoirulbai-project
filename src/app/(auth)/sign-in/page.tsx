@@ -1,7 +1,7 @@
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
 import { AppProps } from 'next/app'
 
-function MyApp({ Component, pageProps }: AppProps) {
+function SignInPage({ Component, pageProps }: AppProps) {
   return (
     <ClerkProvider>
       <SignedIn>
@@ -14,4 +14,4 @@ function MyApp({ Component, pageProps }: AppProps) {
   )
 }
 
-export default MyApp
+export default SignInPage
