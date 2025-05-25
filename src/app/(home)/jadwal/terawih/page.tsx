@@ -117,7 +117,7 @@ const JadwalTarawihPage = () => {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-lg"
           >
-            Ramadhan {currentYear} H / {currentYear} M - Masjid Baitul Makmur
+            Ramadhan {currentYear} H / {currentYear} M - Masjid Khoirul Ba'i
           </motion.p>
         </div>
       </div>

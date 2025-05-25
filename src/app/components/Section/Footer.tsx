@@ -7,7 +7,7 @@ export const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">Masjid Baitul Makmur</h3>
+            <h3 className="text-white text-lg font-bold mb-4">Masjid Khoirul Ba'i</h3>
             <p className="mb-4">
               Pusat ibadah, pendidikan, dan kegiatan sosial masyarakat di Jakarta Barat.
             </p>
@@ -65,7 +65,7 @@ export const Footer = () => {
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
-          <p>© {new Date().getFullYear()} Masjid Baitul Makmur. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Masjid Khoirul Ba'i. All rights reserved.</p>
         </div>
       </div>
     </footer>

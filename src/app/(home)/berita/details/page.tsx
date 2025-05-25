@@ -23,9 +23,9 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
   // In a real app, you would fetch this data from an API based on params.id
   const berita = {
     id: params.id,
-    title: "Masjid Baitul Makmur Gelar Pengajian Bulanan dengan Tema Keikhlasan",
+    title: "Masjid Khoirul Ba'i Gelar Pengajian Bulanan dengan Tema Keikhlasan",
     content: `
-      <p class="mb-4">Pengajian bulanan Masjid Baitul Makmur kali ini menghadirkan Ustadz Ahmad Farid sebagai pembicara utama dengan tema "Keikhlasan dalam Beribadah". Acara yang digelar pada Sabtu, 15 Juni 2024 ini dihadiri oleh ratusan jamaah dari berbagai kalangan.</p>
+      <p class="mb-4">Pengajian bulanan Masjid Khoirul Ba'i kali ini menghadirkan Ustadz Ahmad Farid sebagai pembicara utama dengan tema "Keikhlasan dalam Beribadah". Acara yang digelar pada Sabtu, 15 Juni 2024 ini dihadiri oleh ratusan jamaah dari berbagai kalangan.</p>
       
       <p class="mb-4">Dalam ceramahnya yang berdurasi 90 menit, Ustadz Ahmad menjelaskan bahwa keikhlasan adalah ruh dari setiap ibadah. "Tanpa keikhlasan, ibadah kita hanyalah gerakan fisik tanpa makna," tegas beliau di hadapan jamaah.</p>
       
@@ -50,7 +50,7 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
     date: "15 Juni 2024",
     time: "09:00 - 11:30 WIB",
     author: "Tim Media Masjid",
-    location: "Aula Utama Masjid Baitul Makmur",
+    location: "Aula Utama Masjid Khoirul Ba'i",
     image: "/pengajian-event.jpg",
     relatedNews: [
       {
@@ -67,7 +67,7 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
       },
       {
         id: "4",
-        title: "Dokumentasi Video Kegiatan Bulanan Masjid Baitul Makmur",
+        title: "Dokumentasi Video Kegiatan Bulanan Masjid Khoirul Ba'i",
         date: "2 bulan lalu",
         category: "Video"
       }

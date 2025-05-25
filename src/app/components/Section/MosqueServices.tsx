@@ -18,7 +18,7 @@ export const MosqueServices = ({ services }: MosqueServicesProps) => {
       >
         <h2 className="text-2xl md:text-3xl font-bold dark:text-white">Layanan Masjid</h2>
         <p className="text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
-          Berbagai layanan yang disediakan Masjid Baitul Makmur untuk masyarakat
+          Berbagai layanan yang disediakan Masjid Khoirul Ba'i untuk masyarakat
         </p>
       </motion.div>
 

@@ -83,7 +83,7 @@ const SearchPage = () => {
     },
     {
       title: 'Dokumentasi TPA',
-      description: 'Foto-foto kegiatan TPA Masjid Baitul Makmur',
+      description: 'Foto-foto kegiatan TPA Masjid Khoirul Ba'i',
       category: 'Galeri',
       icon: <ImageIcon className="text-purple-500" />
     },
@@ -234,7 +234,7 @@ const SearchPage = () => {
             {/* Quick Stats */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
               <h3 className="text-lg font-medium dark:text-white mb-4">
-                Masjid Baitul Makmur dalam Angka
+                Masjid Khoirul Ba'i dalam Angka
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3">

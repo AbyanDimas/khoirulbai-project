@@ -8,7 +8,7 @@ const NavLogo = () => (
         <Home className="h-5 w-5" />
       </div>
       <div className="hidden md:block">
-        <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Masjid Baitul Makmur</h1>
+        <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Masjid Khoirul Ba'i</h1>
         <p className="text-xs text-gray-500 dark:text-gray-400">SMKN 1 Adiwerna</p>
       </div>
     </Link>

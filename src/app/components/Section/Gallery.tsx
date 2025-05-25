@@ -20,7 +20,7 @@ export const Gallery = ({ gallery }: GalleryProps) => {
       >
         <div>
           <h2 className="text-2xl font-bold dark:text-white">Galeri Kegiatan</h2>
-          <p className="text-gray-600 dark:text-gray-400">Dokumentasi kegiatan Masjid Baitul Makmur</p>
+          <p className="text-gray-600 dark:text-gray-400">Dokumentasi kegiatan Masjid Khoirul Ba'i</p>
         </div>
         <Link 
           href="/galeri" 

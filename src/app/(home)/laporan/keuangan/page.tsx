@@ -113,7 +113,7 @@ const KeuanganPage = () => {
             Laporan Keuangan Masjid
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Catatan masuk dan keluar keuangan Masjid Baitul Makmur
+            Catatan masuk dan keluar keuangan Masjid Khoirul Ba'i
           </p>
         </div>
       </div>
@@ -340,7 +340,7 @@ const KeuanganPage = () => {
                             <div>
                               <div className="font-medium dark:text-white">Bank Syariah Indonesia</div>
                               <div className="text-sm text-gray-500 dark:text-gray-400">
-                                7141-8901-3040 a.n. Masjid Baitul Makmur
+                                7141-8901-3040 a.n. Masjid Khoirul Ba'i
                               </div>
                             </div>
                           </div>
@@ -352,7 +352,7 @@ const KeuanganPage = () => {
                             <div>
                               <div className="font-medium dark:text-white">Bank Mandiri</div>
                               <div className="text-sm text-gray-500 dark:text-gray-400">
-                                1400-0123-4567 a.n. Masjid Baitul Makmur
+                                1400-0123-4567 a.n. Masjid Khoirul Ba'i
                               </div>
                             </div>
                           </div>
@@ -364,7 +364,7 @@ const KeuanganPage = () => {
                             <div>
                               <div className="font-medium dark:text-white">Dompet Digital</div>
                               <div className="text-sm text-gray-500 dark:text-gray-400">
-                                Dana: 0812-3456-7890 (Masjid Baitul Makmur)
+                                Dana: 0812-3456-7890 (Masjid Khoirul Ba'i)
                               </div>
                             </div>
                           </div>

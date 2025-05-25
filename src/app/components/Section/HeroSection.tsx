@@ -18,7 +18,7 @@ export const HeroSection = () => {
           transition={{ delay: 0.2 }}
           className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
         >
-          Selamat Datang di Masjid Baitul Makmur
+          Selamat Datang di Masjid Khoirul Ba'i
         </motion.h1>
         <motion.p 
           initial={{ y: -10 }}

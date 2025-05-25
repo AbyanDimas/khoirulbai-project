@@ -15,7 +15,7 @@ export const MosqueStats = ({ stats }: MosqueStatsProps) => {
         viewport={{ once: true }}
         className="text-center mb-8"
       >
-        <h2 className="text-2xl md:text-3xl font-bold dark:text-white">Masjid Baitul Makmur dalam Angka</h2>
+        <h2 className="text-2xl md:text-3xl font-bold dark:text-white">Masjid Khoirul Ba'i dalam Angka</h2>
         <p className="text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
           Kontribusi dan aktivitas masjid untuk masyarakat
         </p>

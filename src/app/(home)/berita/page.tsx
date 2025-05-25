@@ -46,6 +46,8 @@ const Berita = () => {
   const [berita, setBerita] = useState<BeritaItem[]>([])
   const [loading, setLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+
 
   useEffect(() => {
     // Simulate API fetch
@@ -55,7 +57,7 @@ const Berita = () => {
       const mockBerita: BeritaItem[] = [
         {
           id: '1',
-          title: 'Masjid Baitul Makmur Gelar Pengajian Bulanan dengan Tema Keikhlasan',
+          title: 'Masjid Khoirul Bai Gelar Pengajian Bulanan dengan Tema Keikhlasan',
           excerpt: 'Pengajian bulanan kali ini menghadirkan Ustadz Ahmad sebagai pembicara utama dengan pembahasan tentang keikhlasan dalam beribadah.',
           category: 'Artikel',
           date: '2 jam yang lalu',
@@ -64,8 +66,8 @@ const Berita = () => {
         },
         {
           id: '2',
-          title: 'Jadwal Sholat Jumat Pekan Ini di Masjid Baitul Makmur',
-          excerpt: 'Berikut jadwal lengkap sholat Jumat beserta nama khatib dan pembicara untuk pekan ini di Masjid Baitul Makmur.',
+          title: 'Jadwal Sholat Jumat Pekan Ini di Masjid Khoirul Bai',
+          excerpt: 'Berikut jadwal lengkap sholat Jumat beserta nama khatib dan pembicara untuk pekan ini di Masjid Khoirul Bai.',
           category: 'Lokal',
           date: '1 hari yang lalu',
           image: '/jumat-prayer.jpg',
@@ -73,8 +75,8 @@ const Berita = () => {
         },
         {
           id: '3',
-          title: 'Video: Dokumentasi Kegiatan Ramadhan 1445H Masjid Baitul Makmur',
-          excerpt: 'Simak rangkuman kegiatan Ramadhan tahun ini di Masjid Baitul Makmur dalam video dokumentasi khusus.',
+          title: 'Video: Dokumentasi Kegiatan Ramadhan 1445H Masjid Khoirul Bai',
+          excerpt: 'Simak rangkuman kegiatan Ramadhan tahun ini di Masjid Khoirul Bai dalam video dokumentasi khusus.',
           category: 'Video',
           date: '3 hari yang lalu',
           image: '/ramadhan-activities.jpg'
@@ -89,7 +91,7 @@ const Berita = () => {
         },
         {
           id: '5',
-          title: 'Pengumuman Pembangunan Area Parkir Baru Masjid Baitul Makmur',
+          title: 'Pengumuman Pembangunan Area Parkir Baru Masjid Khoirul Bai',
           excerpt: 'Pengurus masjid mengumumkan rencana pembangunan area parkir baru untuk menampung kendaraan jamaah yang semakin banyak.',
           category: 'Lokal',
           date: '1 minggu yang lalu',
@@ -98,8 +100,8 @@ const Berita = () => {
         },
         {
           id: '6',
-          title: 'Artikel Khusus: Sejarah Berdirinya Masjid Baitul Makmur',
-          excerpt: 'Bagaimana awal mula berdirinya Masjid Baitul Makmur? Simak sejarah lengkapnya dalam artikel khusus ini.',
+          title: 'Artikel Khusus: Sejarah Berdirinya Masjid Khoirul Bai',
+          excerpt: 'Bagaimana awal mula berdirinya Masjid Khoirul Bai? Simak sejarah lengkapnya dalam artikel khusus ini.',
           category: 'Artikel',
           date: '2 minggu yang lalu',
           image: '/masjid-history.jpg'
@@ -125,32 +127,22 @@ const Berita = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <Menu size={20} />
-              </button>
-              <h1 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 flex items-center">
-                <Newspaper size={24} className="mr-2" />
-                Berita Masjid
-              </h1>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                <Search size={20} />
-              </button>
+            <header className="sticky top-0 z-10 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">            
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari di Berita..."
+                className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
           </div>
         </div>
       </header>
-
       {/* Mobile Category Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (

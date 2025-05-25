@@ -103,7 +103,7 @@ const GalleryPage = () => {
     {
       id: '8',
       type: 'video',
-      title: 'Virtual Tour Masjid Baitul Makmur',
+      title: 'Virtual Tour Masjid Khoirul Bai',
       date: '15 Januari 2024',
       url: '/gallery/virtual-tour.jpg',
       category: 'Video'
@@ -142,14 +142,9 @@ const GalleryPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <header className="sticky top-0 z-10 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h1 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 flex items-center">
-              <ImageIcon className="mr-2" />
-              Galeri Masjid
-            </h1>
-            
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">            
             <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input

@@ -73,46 +73,12 @@ import type {
   StatItem,
 } from "@/app/types";
 
+
 const Home = () => {
   // State for current time and date
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isPlaying, setIsPlaying] = useState(false);
-
-  // Update current time every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Format date
-  const formattedDate = currentTime.toLocaleDateString("id-ID", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  // Hijri date (mock data - in real app you would fetch this)
-  const hijriDate = {
-    day: "15",
-    month: "Dhul-Qadah",
-    year: "1445",
-    hijri: "15 Dhul-Qadah 1445 H",
-  };
-
-  // Weather data (mock data)
-  const weather = {
-    temp: 28,
-    condition: "Partly Cloudy",
-    humidity: 65,
-    wind: 12,
-    icon: <CloudSun className="h-8 w-8 text-yellow-500" />,
-  };
-
-  // Jadwal Sholat Data
-  const jadwalSholat: PrayerSchedule = {
+  const [jadwalSholat, setJadwalSholat] = useState<PrayerSchedule>({
     today: [
       {
         name: "Subuh",
@@ -189,9 +155,51 @@ const Home = () => {
         icon: <Moon className="h-5 w-5" />,
       },
     ],
+  });
+
+  // Update current time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format date
+  const formattedDate = currentTime.toLocaleDateString("id-ID", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  // Hijri date (mock data - in real app you would fetch this)
+  const hijriDate = {
+    day: "15",
+    month: "Dhul-Qadah",
+    year: "1445",
+    hijri: "15 Dhul-Qadah 1445 H",
   };
 
+  // Weather data (mock data)
+  const weather = {
+    temp: 28,
+    condition: "Partly Cloudy",
+    humidity: 65,
+    wind: 12,
+    icon: <CloudSun className="h-8 w-8 text-yellow-500" />,
+  };
+
+
   // Update prayer times status based on current time
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Update prayer times and next prayer
   useEffect(() => {
     const now = currentTime.getHours() * 60 + currentTime.getMinutes();
 
@@ -203,14 +211,29 @@ const Home = () => {
       });
     };
 
-    jadwalSholat.today = updateTimes(jadwalSholat.today);
-    jadwalSholat.tomorrow = updateTimes(jadwalSholat.tomorrow);
+    setJadwalSholat(prev => ({
+      today: updateTimes(prev.today),
+      tomorrow: updateTimes(prev.tomorrow)
+    }));
   }, [currentTime]);
 
   // Find next prayer
-  const nextPrayer =
-    jadwalSholat.today.find((prayer) => !prayer.passed) ||
-    jadwalSholat.tomorrow[0];
+  const getNextPrayer = () => {
+    const now = currentTime.getHours() * 60 + currentTime.getMinutes();
+    
+    // Cari di jadwal hari ini
+    const nextToday = jadwalSholat.today.find(prayer => {
+      const [hours, minutes] = prayer.time.split(":").map(Number);
+      const prayerTime = hours * 60 + minutes;
+      return now < prayerTime;
+    });
+
+    // Jika tidak ada di hari ini, ambil yang pertama di hari berikutnya
+    return nextToday || jadwalSholat.tomorrow[0];
+  };
+
+  const nextPrayer = getNextPrayer();
+
 
   // Agenda Terdekat
   const upcomingEvents: Event[] = [
@@ -432,7 +455,7 @@ const Home = () => {
       title: "Pendaftaran TPA Tahun Ajaran Baru",
       date: "15 Juni 2024",
       content:
-        "Pendaftaran TPA/TPQ Baitul Makmur tahun ajaran 2024/2025 dibuka mulai 15 Juni - 30 Juni 2024.",
+        "Pendaftaran TPA/TPQ Khoirul Ba'i tahun ajaran 2024/2025 dibuka mulai 15 Juni - 30 Juni 2024.",
       important: true,
     },
     {

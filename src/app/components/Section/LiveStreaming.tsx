@@ -17,7 +17,7 @@ export const LiveStreaming = () => {
       >
         <div>
           <h2 className="text-2xl font-bold dark:text-white">Live Streaming</h2>
-          <p className="text-gray-600 dark:text-gray-400">Siaran langsung dari Masjid Baitul Makmur</p>
+          <p className="text-gray-600 dark:text-gray-400">Siaran langsung dari Masjid Khoirul Ba'i</p>
         </div>
         <div className="flex items-center">
           <span className="flex items-center text-red-600 text-sm mr-4">
@@ -78,7 +78,7 @@ export const LiveStreaming = () => {
         <div className="p-4">
           <h3 className="font-bold dark:text-white mb-1">Sholat Jumat Bersama - Ust. Muhammad Ali</h3>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            Siaran langsung sholat Jumat dari Masjid Baitul Makmur
+            Siaran langsung sholat Jumat dari Masjid Khoirul Ba'i
           </p>
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
