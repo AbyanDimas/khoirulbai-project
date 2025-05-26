@@ -13,7 +13,9 @@ import {
   Mic2,
   FileText,
   Newspaper,
-  Images
+  Images,
+  Clock10,
+  HandHeart
 } from 'lucide-react'
 
 interface DesktopMenuProps {
@@ -61,7 +63,7 @@ const DesktopMenu = ({ pathname, dropdownOpen, toggleDropdown }: DesktopMenuProp
       />
 
       <Link 
-        href="/tausyiah" 
+        href="/tausiyah" 
         className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
           isActive('/tausyiah') 
             ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800' 
@@ -86,7 +88,7 @@ const JadwalDropdown = ({ pathname, dropdownOpen, toggleDropdown }: { pathname: 
     <button
       onClick={toggleDropdown}
       className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-        pathname.startsWith('/jadwal') 
+        pathname.startsWith('/jadwal-sholat') 
           ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800' 
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
       }`}
@@ -111,7 +113,7 @@ const JadwalDropdown = ({ pathname, dropdownOpen, toggleDropdown }: { pathname: 
         >
           <div className="py-1">
             <Link
-              href="/jadwal-jumat"
+              href="/jadwal/jumat"
               className={`flex items-center px-4 py-2 text-sm transition-colors duration-150 ${
                 pathname === '/jadwal-jumat' 
                   ? 'bg-emerald-50 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400' 
@@ -122,7 +124,7 @@ const JadwalDropdown = ({ pathname, dropdownOpen, toggleDropdown }: { pathname: 
               Jadwal Jumat
             </Link>
             <Link
-              href="/jadwal-tarawih"
+              href="/jadwal/tarawih"
               className={`flex items-center px-4 py-2 text-sm transition-colors duration-150 ${
                 pathname === '/jadwal-tarawih' 
                   ? 'bg-emerald-50 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400' 
@@ -133,9 +135,9 @@ const JadwalDropdown = ({ pathname, dropdownOpen, toggleDropdown }: { pathname: 
               Jadwal Tarawih
             </Link>
             <Link
-              href="/jadwal-pengajian"
+              href="/jadwal/kultum-pengajian"
               className={`flex items-center px-4 py-2 text-sm transition-colors duration-150 ${
-                pathname === '/jadwal-pengajian' 
+                pathname === '/jadwal/kultum-pengajian' 
                   ? 'bg-emerald-50 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400' 
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
@@ -256,6 +258,40 @@ const LainnyaDropdown = ({ pathname, dropdownOpen, toggleDropdown }: { pathname:
                 <Images className="h-5 w-5" />
               </div>
               Galeri
+            </Link>
+                 <Link
+              href="/jadwal-sholat"
+              className={`flex flex-col items-center p-3 rounded-lg text-sm transition-colors duration-150 ${
+                pathname === '/jadwal-sholat' 
+                  ? 'bg-emerald-50 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400' 
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              <div className={`flex items-center justify-center h-10 w-10 rounded-lg mb-2 ${
+                pathname === '/jadwal-sholat' 
+                  ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300' 
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+              }`}>
+                <Clock10 className="h-5 w-5" />
+              </div>
+              Jadwal Sholat
+            </Link>
+                      <Link
+              href="/zakat-infaq"
+              className={`flex flex-col items-center p-3 rounded-lg text-sm transition-colors duration-150 ${
+                pathname === '/zakat-infaq' 
+                  ? 'bg-emerald-50 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400' 
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              <div className={`flex items-center justify-center h-10 w-10 rounded-lg mb-2 ${
+                pathname === '/zakat-infaq' 
+                  ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300' 
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+              }`}>
+                <HandHeart className="h-5 w-5" />
+              </div>
+              Zakat & Infaq
             </Link>
           </div>
         </motion.div>
