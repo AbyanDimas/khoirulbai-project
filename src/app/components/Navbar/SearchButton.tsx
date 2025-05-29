@@ -32,7 +32,7 @@ const SearchButton = ({
         aria-label="Search"
       >
         <Search className="h-4 w-4 mr-2" />
-        <span className="text-sm">Search</span>
+        <span className="text-sm">Pencarian</span>
       </button>
 
       <AnimatePresence>
@@ -83,6 +83,11 @@ const SearchButton = ({
                   </li>
                 ))}
               </ul>
+            </div>
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Tekan Enter untuk mencari atau klik salah satu saran di atas.
+              </p>
             </div>
           </motion.div>
         )}

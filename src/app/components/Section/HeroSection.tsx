@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Megaphone, Play } from 'lucide-react';
+import { ArrowRight, ImagePlay, Megaphone, Play } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const HeroSection = () => {
   return (
@@ -8,8 +9,15 @@ export const HeroSection = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative bg-emerald-700 text-white py-16 md:py-24"
+      className="relative bg-black  text-white py-16 md:py-24"
     >
+        <Image 
+          src="/images/hero-bg.jpg" 
+          alt="Masjid Khoirul Ba'i" 
+          layout="fill" 
+          objectFit="cover" 
+          className="absolute inset-0 object-cover opacity-50"
+        />
       <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
       <div className="container mx-auto px-4 text-center relative">
         <motion.h1 
@@ -41,16 +49,10 @@ export const HeroSection = () => {
             Lihat Agenda <ArrowRight className="ml-2" />
           </Link>
           <Link 
-            href="/tausyiah" 
+            href="/galeri" 
             className="px-6 py-3 bg-emerald-800 text-white rounded-lg font-medium hover:bg-emerald-900 transition-colors flex items-center"
           >
-            Tausyiah <Megaphone className="ml-2" />
-          </Link>
-          <Link 
-            href="/live" 
-            className="px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center"
-          >
-            Live Streaming <Play className="ml-2" />
+            Galeri Kegiatan <ImagePlay className="ml-2" />
           </Link>
         </motion.div>
       </div>

@@ -55,11 +55,11 @@ export const LocationMap = () => {
           </div>
           <div className="flex items-center">
             <Phone className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
-            <span className="dark:text-white">(0283) 12345678</span>
+            <span className="dark:text-white">-</span>
           </div>
           <div className="flex items-center">
             <Mail className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
-            <span className="dark:text-white">info@khoirulbai.id</span>
+            <span className="dark:text-white">info@smkn1adw.sch.id</span>
           </div>
         </div>
       </motion.div>

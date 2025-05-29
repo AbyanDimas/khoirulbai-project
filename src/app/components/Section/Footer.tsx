@@ -51,15 +51,15 @@ export const Footer = () => {
             <address className="not-italic space-y-2">
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-                <span>Jl. Kebon Jeruk No. 45, Jakarta Barat, Indonesia</span>
+                <span>Jl. Raya Adiwerna No.Km. 5, Kaliwadas, Kec. Adiwerna, Kabupaten Tegal, Jawa Tengah 52194</span>
               </div>
               <div className="flex items-center">
                 <Phone className="h-5 w-5 mr-2" />
-                <span>(021) 12345678</span>
+                <span>-</span>
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 mr-2" />
-                <span>info@baitulmakmur.id</span>
+                <span>info@smkn1adw.sch.id</span>
               </div>
             </address>
           </div>

@@ -43,12 +43,6 @@ export const CtaSection = () => {
           >
             Lihat Kegiatan <CalendarDays className="ml-2" />
           </Link>
-          <Link 
-            href="/relawan" 
-            className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors flex items-center"
-          >
-            Jadi Relawan <Users className="ml-2" />
-          </Link>
         </motion.div>
       </div>
     </section>
