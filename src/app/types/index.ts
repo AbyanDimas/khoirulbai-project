@@ -47,6 +47,7 @@ export type GalleryItem = {
   date: string;
   category: string;
   image: string;
+  type: 'video' | 'image';
 };
 
 export type Announcement = {

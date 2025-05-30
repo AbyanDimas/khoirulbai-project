@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search,
@@ -25,11 +25,12 @@ type GalleryItem = {
   url: string
   category: string
   liked?: boolean
+  description?: string
 }
 
 const categories = [
   { name: 'Semua', icon: <Grid2X2 size={16} /> },
-  { name: 'Foto', icon: <ImageIcon size={16} /> },
+  { name: 'Gambar', icon: <ImageIcon size={16} /> },
   { name: 'Video', icon: <Video size={16} /> },
   { name: 'Album', icon: <Album size={16} /> }
 ]
@@ -40,79 +41,62 @@ const GalleryPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Mock data - replace with actual API call
-  const galleryItems: GalleryItem[] = [
-    {
-      id: '1',
-      type: 'image',
-      title: 'Kegiatan Pengajian Bulanan Juni 2024',
-      date: '15 Juni 2024',
-      url: '/gallery/pengajian-juni.jpg',
-      category: 'Foto',
-      liked: true
-    },
-    {
-      id: '2',
-      type: 'video',
-      title: 'Dokumentasi Sholat Jumat',
-      date: '10 Juni 2024',
-      url: '/gallery/jumat-prayer.jpg',
-      category: 'Video'
-    },
-    {
-      id: '3',
-      type: 'image',
-      title: 'Kegiatan Ramadhan 1445H',
-      date: '1 April 2024',
-      url: '/gallery/ramadhan-activities.jpg',
-      category: 'Foto'
-    },
-    {
-      id: '4',
-      type: 'image',
-      title: 'Pembangunan Area Parkir Baru',
-      date: '20 Mei 2024',
-      url: '/gallery/parking-construction.jpg',
-      category: 'Foto'
-    },
-    {
-      id: '5',
-      type: 'video',
-      title: 'Wawancara dengan Ketua Takmir',
-      date: '5 Mei 2024',
-      url: '/gallery/interview.jpg',
-      category: 'Video'
-    },
-    {
-      id: '6',
-      type: 'image',
-      title: 'Acara Maulid Nabi 1445H',
-      date: '12 Oktober 2023',
-      url: '/gallery/maulid-nabi.jpg',
-      category: 'Album'
-    },
-    {
-      id: '7',
-      type: 'image',
-      title: 'Kegiatan TPA Masjid',
-      date: '3 Maret 2024',
-      url: '/gallery/tpa-activity.jpg',
-      category: 'Foto'
-    },
-    {
-      id: '8',
-      type: 'video',
-      title: 'Virtual Tour Masjid Khoirul Bai',
-      date: '15 Januari 2024',
-      url: '/gallery/virtual-tour.jpg',
-      category: 'Video'
+  useEffect(() => {
+    const fetchGalleryItems = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/galeris?populate=*`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch gallery items')
+        }
+        const data = await response.json()
+        
+        const formattedItems = data.data.map((item: any) => {
+          let imageUrl = '/placeholder.jpg';
+          if (item.attributes.gambar?.data?.attributes?.url) {
+            if (item.attributes.gambar.data.attributes.url.startsWith('http')) {
+              imageUrl = item.attributes.gambar.data.attributes.url;
+            } else {
+              imageUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.attributes.gambar.data.attributes.url}`;
+            }
+          }
+
+          return {
+            id: item.id.toString(),
+            type: item.attributes.type === 'Video' ? 'video' : 'image',
+            title: item.attributes.judul,
+            description: item.attributes.deskripsi,
+            date: new Date(item.attributes.tanggal).toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            }),
+            url: imageUrl,
+            category: item.attributes.type,
+            liked: false
+          }
+        })
+
+        setGalleryItems(formattedItems)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred')
+        console.error('Error fetching gallery items:', err)
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchGalleryItems()
+  }, [])
 
   const filteredItems = galleryItems.filter(item => {
     const matchesCategory = activeCategory === 'Semua' || item.category === activeCategory
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         item.description?.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
@@ -137,6 +121,34 @@ const GalleryPage = () => {
     }
     
     setSelectedItem(filteredItems[newIndex])
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+            <ImageIcon className="text-gray-400" size={40} />
+          </div>
+          <h3 className="text-lg font-medium dark:text-white">Error loading gallery</h3>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -230,6 +242,11 @@ const GalleryPage = () => {
                   className="relative aspect-video bg-gray-200 dark:bg-gray-700 cursor-pointer"
                   onClick={() => openLightbox(item)}
                 >
+                  <img 
+                    src={item.url} 
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-300" />
                   {item.type === 'video' && (
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -283,9 +300,14 @@ const GalleryPage = () => {
                 className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300 flex"
               >
                 <div 
-                  className="w-32 h-32 flex-shrink-0 bg-gray-200 dark:bg-gray-700 cursor-pointer"
+                  className="w-32 h-32 flex-shrink-0 bg-gray-200 dark:bg-gray-700 cursor-pointer relative"
                   onClick={() => openLightbox(item)}
                 >
+                  <img 
+                    src={item.url} 
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-300" />
                 </div>
                 <div className="p-4 flex-grow">
@@ -374,31 +396,30 @@ const GalleryPage = () => {
                 className="bg-black rounded-lg overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="aspect-video bg-gray-800 flex items-center justify-center">
-                  {selectedItem.type === 'video' ? (
-                    <div className="relative w-full h-full">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="32"
-                            height="32"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-white ml-1"
-                          >
-                            <polygon points="5 3 19 12 5 21 5 3" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
+                <div className="aspect-video bg-gray-800 flex items-center justify-center relative">
+                  <img
+                    src={selectedItem.url}
+                    alt={selectedItem.title}
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                  {selectedItem.type === 'video' && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <ImageIcon className="text-gray-600" size={48} />
+                      <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="text-white ml-1"
+                        >
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -408,6 +429,9 @@ const GalleryPage = () => {
                     <div>
                       <h3 className="text-lg font-medium">{selectedItem.title}</h3>
                       <p className="text-gray-400 text-sm">{selectedItem.date}</p>
+                      {selectedItem.description && (
+                        <p className="text-gray-300 mt-2 text-sm">{selectedItem.description}</p>
+                      )}
                     </div>
                     <div className="flex space-x-3">
                       <button className="hover:text-emerald-400">
