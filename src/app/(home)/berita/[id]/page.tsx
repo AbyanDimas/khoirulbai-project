@@ -11,9 +11,7 @@ import {
   User,
   MessageSquare,
   ThumbsUp,
-  Facebook,
-  Twitter,
-  Linkedin,
+  CircleHelp,
   MessageCircle,
   Link as LinkIcon,
   CalendarDays,
@@ -400,14 +398,14 @@ const processedContent = newsItem.content
               whileHover={{ y: -2 }}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-full text-sm"
             >
-              <Facebook size={16} className="mr-2" />
+              <CircleHelp size={16} className="mr-2" />
               Facebook
             </motion.button>
             <motion.button
               whileHover={{ y: -2 }}
               className="flex items-center px-4 py-2 bg-sky-500 text-white rounded-full text-sm"
             >
-              <Twitter size={16} className="mr-2" />
+              <CircleHelp size={16} className="mr-2" />
               Twitter
             </motion.button>
             <motion.button
@@ -421,7 +419,7 @@ const processedContent = newsItem.content
               whileHover={{ y: -2 }}
               className="flex items-center px-4 py-2 bg-blue-700 text-white rounded-full text-sm"
             >
-              <Linkedin size={16} className="mr-2" />
+              <CircleHelp size={16} className="mr-2" />
               LinkedIn
             </motion.button>
             <motion.button

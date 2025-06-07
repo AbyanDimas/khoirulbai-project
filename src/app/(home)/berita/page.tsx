@@ -9,7 +9,6 @@ import {
   Share2, 
   MoreHorizontal,
   Search,
-  Menu,
   ChevronDown,
   Newspaper,
   TrendingUp,

@@ -6,7 +6,7 @@ import {
   Search,
   Grid2X2,
   List,
-  Image as ImageIcon,
+  Image,
   Video,
   Album,
   ChevronLeft,
@@ -30,7 +30,7 @@ type GalleryItem = {
 
 const categories = [
   { name: 'Semua', icon: <Grid2X2 size={16} /> },
-  { name: 'Gambar', icon: <ImageIcon size={16} /> },
+  { name: 'Gambar', icon: <Image size={16} /> },
   { name: 'Video', icon: <Video size={16} /> },
   { name: 'Album', icon: <Album size={16} /> }
 ]
@@ -136,7 +136,7 @@ const GalleryPage = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-            <ImageIcon className="text-gray-400" size={40} />
+            <Image className="text-gray-400" size={40} />
           </div>
           <h3 className="text-lg font-medium dark:text-white">Error loading gallery</h3>
           <p className="text-gray-500 dark:text-gray-400 mt-1">{error}</p>
@@ -223,7 +223,7 @@ const GalleryPage = () => {
         {filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-              <ImageIcon className="text-gray-400" size={40} />
+              <Image className="text-gray-400" size={40} />
             </div>
             <h3 className="text-lg font-medium dark:text-white">Tidak ada item yang ditemukan</h3>
             <p className="text-gray-500 dark:text-gray-400 mt-1">Coba gunakan kata kunci lain atau pilih kategori berbeda</p>

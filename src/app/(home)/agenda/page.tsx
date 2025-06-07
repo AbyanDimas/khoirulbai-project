@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { CalendarDays, Clock, MapPin, ChevronRight, Users, BookOpen, House, MoonStar } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 
 type AgendaItem = {
   id: string;
