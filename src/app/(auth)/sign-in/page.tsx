@@ -1,17 +1,9 @@
-import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
-import { AppProps } from 'next/app'
-
-function SignInPage({ Component, pageProps }: AppProps) {
+import { SignIn } from "@clerk/nextjs";
+ 
+export default function Page() {
   return (
-    <ClerkProvider>
-      <SignedIn>
-        <Component {...pageProps} />
-      </SignedIn>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-    </ClerkProvider>
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 flex items-center justify-center">
+      <SignIn />
+    </div>
   )
 }
-
-export default SignInPage
