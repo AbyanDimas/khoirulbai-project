@@ -7,7 +7,7 @@ interface MosqueStatsProps {
 
 export const MosqueStats = ({ stats }: MosqueStatsProps) => {
   return (
-    <section className="container mx-auto px-4 py-12 bg-white dark:bg-gray-800">
+    <section className="container mx-auto px-4 py-12 bg-white dark:bg-gray-800 rounded-xl">
       <motion.div 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

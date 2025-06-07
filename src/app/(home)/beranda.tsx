@@ -345,136 +345,6 @@ const Beranda = () => {
     },
   ];
 
-  // Tausyiah Terbaru
-  const tausyiah: Tausyiah[] = [
-    {
-      id: 1,
-      title: "Keutamaan Sholat Berjamaah di Masjid",
-      description:
-        "Penjelasan tentang fadhilah dan keutamaan sholat berjamaah di masjid bagi laki-laki muslim.",
-      date: "14 Juni 2024",
-      time: "15:30 WIB",
-      duration: "25:14",
-      speaker: "Ust. Abdul Somad",
-      type: "video",
-      views: "1.2K",
-      image: "/tausyiah/sholat.jpg",
-    },
-    {
-      id: 2,
-      title: "Tafsir Surat Al-Fatihah",
-      description:
-        "Kajian mendalam tentang makna dan tafsir dari surat pembuka Al-Book.",
-      date: "12 Juni 2024",
-      time: "13:00 WIB",
-      duration: "42:05",
-      speaker: "Ust. Adi Hidayat",
-      type: "audio",
-      views: "856",
-      image: "/tausyiah/tafsir.jpg",
-    },
-    {
-      id: 3,
-      title: "Menyambut Bulan Ramadhan",
-      description:
-        "Persiapan menyambut bulan suci Ramadhan dengan penuh keberkahan.",
-      date: "10 Juni 2024",
-      time: "20:00 WIB",
-      duration: "18:32",
-      speaker: "Ust. Khalid Basalamah",
-      type: "video",
-      views: "2.3K",
-      image: "/tausyiah/ramadhan.jpg",
-    },
-  ];
-
-  // Galeri Kegiatan
-  const gallery: GalleryItem[] = [
-    {
-      id: 1,
-      title: "Kegiatan TPA",
-      date: "10 Juni 2024",
-      category: "pendidikan",
-      image: "/gallery/tpa.jpg",
-    },
-    {
-      id: 2,
-      title: "Sholat Jumat",
-      date: "7 Juni 2024",
-      category: "sholat",
-      image: "/gallery/jumat.jpg",
-    },
-    {
-      id: 3,
-      title: "Pengajian Rutin",
-      date: "5 Juni 2024",
-      category: "pengajian",
-      image: "/gallery/pengajian.jpg",
-    },
-    {
-      id: 4,
-      title: "Buka Puasa Bersama",
-      date: "3 Juni 2024",
-      category: "ramadhan",
-      image: "/gallery/buka.jpg",
-    },
-    {
-      id: 5,
-      title: "Sholat Tarawih",
-      date: "2 Juni 2024",
-      category: "ramadhan",
-      image: "/gallery/tarawih.jpg",
-    },
-    {
-      id: 6,
-      title: "Santunan Anak Yatim",
-      date: "1 Juni 2024",
-      category: "sosial",
-      image: "/gallery/santunan.jpg",
-    },
-    {
-      id: 7,
-      title: "Kegiatan Remaja Masjid",
-      date: "28 Mei 2024",
-      category: "remaja",
-      image: "/gallery/remaja.jpg",
-    },
-    {
-      id: 8,
-      title: "Peresmian Masjid",
-      date: "25 Mei 2024",
-      category: "acara",
-      image: "/gallery/peresmian.jpg",
-    },
-  ];
-
-  // Pengumuman
-  const announcements: Announcement[] = [
-    {
-      id: 1,
-      title: "Pendaftaran TPA Tahun Ajaran Baru",
-      date: "15 Juni 2024",
-      content:
-        "Pendaftaran TPA/TPQ Khoirul Ba'i tahun ajaran 2024/2025 dibuka mulai 15 Juni - 30 Juni 2024.",
-      important: true,
-    },
-    {
-      id: 2,
-      title: "Jadwal Kajian Bulan Juni",
-      date: "10 Juni 2024",
-      content:
-        "Telah tersedia jadwal kajian rutin bulan Juni 2024. Silakan cek di bagian agenda.",
-      important: false,
-    },
-    {
-      id: 3,
-      title: "Donasi Pembangunan Masjid",
-      date: "5 Juni 2024",
-      content:
-        "Masih membuka donasi untuk perluasan area parkir dan perbaikan fasilitas masjid.",
-      important: true,
-    },
-  ];
 
   // Statistik Masjid
   const stats: StatItem[] = [
@@ -526,15 +396,19 @@ const Beranda = () => {
             nextPrayer={nextPrayer}
             currentTime={currentTime}
           />
-          <UpcomingEvents events={upcomingEvents} />
+          <UpcomingEvents />
         </motion.div>
       </section>
 
-      <ImportantAnnouncements announcements={announcements} />
+<div className="container mx-auto px-4 py-12">
+      <ImportantAnnouncements />
+</div>
+      <div className="container mx-auto px-4 py-12">
       <MosqueStats stats={stats} />
+      </div>
       <MosqueServices services={services} />
-      <LatestTausyiah tausyiah={tausyiah} />
-      <Gallery gallery={gallery} />
+      <LatestTausyiah />
+      <Gallery />
       <LiveStreaming />
       <LocationMap />
       <CtaSection />

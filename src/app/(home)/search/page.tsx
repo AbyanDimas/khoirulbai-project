@@ -1,265 +1,151 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Link from 'next/link'
-import { 
-  Search,
-  X,
-  Clock,
-  Bookmark,
-  Share2,
-  FileText,
-  CalendarDays,
-  Image as ImageIcon,
-  Mic2,
-  Newspaper,
-  ChevronDown,
-  Flame,
-  History,
-  Star
-} from 'lucide-react'
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
-type SearchResult = {
-  id: string
-  type: 'article' | 'agenda' | 'image' | 'audio' | 'news'
-  title: string
-  excerpt: string
-  date: string
-  category?: string
-  url: string
-}
+const availablePages = [
+  { path: '/agenda', name: 'Agenda', description: 'Jadwal kegiatan masjid' },
+  { path: '/berita/:id', name: 'Berita Detail', description: 'Detail berita masjid' },
+  { path: '/berita/galeri', name: 'Galeri Berita', description: 'Galeri foto kegiatan' },
+  { path: '/jadwal/jumat', name: 'Jadwal Sholat Jumat', description: 'Jadwal khutbah dan imam' },
+  { path: '/jadwal/kultum-pengajian', name: 'Jadwal Kultum & Pengajian', description: 'Jadwal kajian rutin' },
+  { path: '/jadwal/terawih', name: 'Jadwal Sholat Terawih', description: 'Jadwal ramadhan' },
+  { path: '/laporan/keuangan', name: 'Laporan Keuangan', description: 'Transparansi keuangan masjid' },
+  { path: '/laporan/waqaf', name: 'Laporan Waqaf', description: 'Laporan donasi waqaf' },
+  { path: '/tausiyah', name: 'Tausiyah', description: 'Artikel islami' },
+  { path: '/beranda', name: 'Beranda', description: 'Halaman utama' },
+];
 
-const SearchPage = () => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isSearching, setIsSearching] = useState(false)
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [activeFilter, setActiveFilter] = useState('all')
-  const [showFilters, setShowFilters] = useState(false)
+export default function SearchPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const query = searchParams.q as string;
+  const [mounted, setMounted] = useState(false);
 
-  // Mock search function - replace with actual API call
-  const performSearch = (query: string) => {
-    if (!query.trim()) {
-      setResults([])
-      return
-    }
-
-    setIsSearching(true)
-    
-    // Simulate API delay
-    setTimeout(() => {
-      const mockResults: SearchResult[] = [
-        // ... (previous mock data remains the same)
-      ].filter(item => 
-        item.title.toLowerCase().includes(query.toLowerCase()) || 
-        item.excerpt.toLowerCase().includes(query.toLowerCase())
+  const searchResults = query
+    ? availablePages.filter((page) =>
+        page.name.toLowerCase().includes(query.toLowerCase()) ||
+        page.description.toLowerCase().includes(query.toLowerCase())
       )
+    : [];
 
-      setResults(mockResults)
-      setIsSearching(false)
-    }, 800)
+  // Animation variants
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
   }
 
-  // Popular searches and content suggestions
-  const popularSearches = [
-    { query: 'Jadwal Sholat Jumat', icon: <CalendarDays size={16} /> },
-    { query: 'Pengajian Bulanan', icon: <Mic2 size={16} /> },
-    { query: 'Galeri Ramadhan', icon: <ImageIcon size={16} /> },
-    { query: 'Laporan Keuangan', icon: <FileText size={16} /> }
-  ]
-
-  const contentSuggestions = [
-    {
-      title: 'Panduan Sholat Jamaah',
-      description: 'Tata cara dan adab sholat berjamaah di masjid',
-      category: 'Artikel',
-      icon: <FileText className="text-blue-500" />
-    },
-    {
-      title: 'Kalender Kegiatan 2024',
-      description: 'Jadwal lengkap kegiatan masjid sepanjang tahun',
-      category: 'Agenda',
-      icon: <CalendarDays className="text-green-500" />
-    },
-    {
-      title: 'Dokumentasi TPA',
-      description: 'Foto-foto kegiatan TPA Masjid Khoirul Ba'i',
-      category: 'Galeri',
-      icon: <ImageIcon className="text-purple-500" />
-    },
-    {
-      title: 'Rekaman Khutbah Terbaru',
-      description: 'Audio khutbah Jumat minggu ini',
-      category: 'Audio',
-      icon: <Mic2 className="text-red-500" />
-    }
-  ]
-
-  // ... (previous useEffect and helper functions remain the same)
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Search Header */}
-      {/* ... (previous header code remains the same) */}
-
-      {/* Search Results */}
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        {isSearching ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, index) => (
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      <div className="container mx-auto px-4 py-12">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl mx-auto"
+        >
+          {query ? (
+            <>
+              <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">
+                Hasil pencarian untuk "<span className="text-emerald-600 dark:text-emerald-400">{query}</span>"
+              </h1>
+              
+              {searchResults.length > 0 ? (
+                <motion.ul 
+                  variants={container}
+                  initial="hidden"
+                  animate="show"
+                  className="space-y-4"
+                >
+                  {searchResults.map((page) => (
+                    <motion.li 
+                      key={page.path}
+                      variants={item}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <a
+                        href={page.path}
+                        className="block p-5 bg-white dark:bg-gray-800 hover:bg-emerald-50 dark:hover:bg-gray-700 rounded-xl transition-all border border-gray-200 dark:border-gray-700 shadow-sm"
+                      >
+                        <h3 className="font-medium text-lg text-emerald-700 dark:text-emerald-400">{page.name}</h3>
+                        <p className="text-emerald-500 dark:text-emerald-300 text-sm mb-2">{page.path}</p>
+                        <p className="text-gray-600 dark:text-gray-300">{page.description}</p>
+                      </a>
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-gray-300 dark:text-gray-600 mb-4">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  <h2 className="text-xl font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    Tidak ditemukan
+                  </h2>
+                  <p className="text-gray-500 dark:text-gray-500">
+                    Tidak ada halaman yang cocok dengan pencarian Anda.
+                  </p>
+                </motion.div>
+              )}
+            </>
+          ) : (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-center py-16"
+            >
               <motion.div
-                key={index}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+                animate={{ 
+                  y: [0, -10, 0],
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 3,
+                  ease: "easeInOut"
+                }}
+                className="mx-auto w-24 h-24 bg-emerald-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-6"
               >
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 animate-pulse"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500 dark:text-emerald-400">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
               </motion.div>
-            ))}
-          </div>
-        ) : searchQuery && filteredResults.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-              <Search className="text-gray-400" size={40} />
-            </div>
-            <h3 className="text-lg font-medium dark:text-white">Tidak ada hasil ditemukan</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
-              Tidak ada hasil untuk "{searchQuery}". Coba kata kunci lain.
-            </p>
-          </motion.div>
-        ) : filteredResults.length > 0 ? (
-          <div className="space-y-4">
-            {/* ... (previous results display code remains the same) */}
-          </div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-8"
-          >
-            {/* Popular Searches Section */}
-            <div>
-              <h3 className="flex items-center text-lg font-medium dark:text-white mb-4">
-                <Flame className="text-orange-500 mr-2" />
-                Pencarian Populer
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {popularSearches.map((search, index) => (
-                  <motion.button
-                    key={index}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSearchQuery(search.query)}
-                    className="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow"
-                  >
-                    <span className="bg-gray-100 dark:bg-gray-700 p-2 rounded-full mr-3">
-                      {search.icon}
-                    </span>
-                    <span className="text-left">
-                      <p className="font-medium dark:text-white">{search.query}</p>
-                    </span>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Activities Section */}
-            <div>
-              <h3 className="flex items-center text-lg font-medium dark:text-white mb-4">
-                <History className="text-blue-500 mr-2" />
-                Aktivitas Terkini
-              </h3>
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                <div className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                  <div className="bg-green-100 dark:bg-green-900/20 p-2 rounded-full mr-3">
-                    <CalendarDays className="text-green-600 dark:text-green-400" size={18} />
-                  </div>
-                  <div>
-                    <p className="font-medium dark:text-white">Pengajian Remaja</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">15 Juni 2024 • 19:30 WIB</p>
-                  </div>
-                </div>
-                <div className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                  <div className="bg-blue-100 dark:bg-blue-900/20 p-2 rounded-full mr-3">
-                    <Newspaper className="text-blue-600 dark:text-blue-400" size={18} />
-                  </div>
-                  <div>
-                    <p className="font-medium dark:text-white">Berita Pembangunan Parkir</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Progress 80% selesai</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Content Suggestions */}
-            <div>
-              <h3 className="flex items-center text-lg font-medium dark:text-white mb-4">
-                <Star className="text-yellow-500 mr-2" />
-                Rekomendasi Untuk Anda
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {contentSuggestions.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ y: -5 }}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg overflow-hidden transition-shadow"
-                  >
-                    <div className="p-4">
-                      <div className="flex items-start">
-                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg mr-4">
-                          {item.icon}
-                        </div>
-                        <div>
-                          <h4 className="font-bold dark:text-white">{item.title}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{item.description}</p>
-                          <span className="inline-block mt-2 px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full">
-                            {item.category}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
-              <h3 className="text-lg font-medium dark:text-white mb-4">
-                Masjid Khoirul Ba'i dalam Angka
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-3">
-                  <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">24</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Kegiatan Bulan Ini</div>
-                </div>
-                <div className="p-3">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">1.2K</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Jamaah/Minggu</div>
-                </div>
-                <div className="p-3">
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">56</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Galeri Foto</div>
-                </div>
-                <div className="p-3">
-                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">18</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Rekaman Tausiyah</div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
+              <h2 className="text-2xl font-medium text-gray-800 dark:text-white mb-3">
+                Silahkan gunakan kolom pencarian
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                Ketik kata kunci di kolom pencarian navbar untuk menemukan halaman yang relevan.
+              </p>
+            </motion.div>
+          )}
+        </motion.div>
       </div>
     </div>
-  )
+  );
 }
-
-export default SearchPage

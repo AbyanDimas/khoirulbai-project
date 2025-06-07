@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.19.4",
+    "@google/generative-ai": "^0.24.1",
     "lucide-react": "^0.511.0",
     "material-icons": "^1.13.14",
     "motion": "^12.12.1",

@@ -34,7 +34,7 @@ export const HeroSection = () => {
           transition={{ delay: 0.3 }}
           className="text-lg md:text-xl max-w-3xl mx-auto mb-8"
         >
-          Masjid sebagai pusat ibadah, pendidikan, dan kegiatan sosial masyarakat
+          Masjid yang Menjadikan Siswa-Siswi yang taat beribadah
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}

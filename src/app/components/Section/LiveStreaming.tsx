@@ -20,9 +20,9 @@ export const LiveStreaming = () => {
           <p className="text-gray-600 dark:text-gray-400">Siaran langsung dari Masjid Khoirul Ba'i</p>
         </div>
         <div className="flex items-center">
-          <span className="flex items-center text-red-600 text-sm mr-4">
-            <span className="w-2 h-2 bg-red-600 rounded-full mr-1 animate-pulse"></span>
-            LIVE NOW
+          <span className="flex items-center text-red text-sm mr-4">
+            <span className="w-2 h-2 bg-gray-500 rounded-full mr-1 animate-pulse"></span>
+            Sedang Tidak Siaran Langsung 
           </span>
           <Link 
             href="/live" 
