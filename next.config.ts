@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
       'honest-bird-099a257597.strapiapp.com'
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

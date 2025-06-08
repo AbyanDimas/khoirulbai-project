@@ -9,7 +9,7 @@ export const Footer = () => {
           <div>
             <h3 className="text-white text-lg font-bold mb-4">Masjid Khoirul Ba'i</h3>
             <p className="mb-4">
-              Pusat ibadah, pendidikan, dan kegiatan sosial masyarakat di Jakarta Barat.
+              Masjid yang Menjadikan Siswa-Siswi yang taat beribadah.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -29,7 +29,7 @@ export const Footer = () => {
           <div>
             <h3 className="text-white text-lg font-bold mb-4">Tautan Cepat</h3>
             <ul className="space-y-2">
-              <li><Link href="/tentang" className="hover:text-white transition-colors">Tentang Kami</Link></li>
+              <li><Link href="/tentang-kami" className="hover:text-white transition-colors">Tentang Kami</Link></li>
               <li><Link href="/jadwal" className="hover:text-white transition-colors">Jadwal Sholat</Link></li>
               <li><Link href="/kajian" className="hover:text-white transition-colors">Kajian Rutin</Link></li>
               <li><Link href="/donasi" className="hover:text-white transition-colors">Donasi</Link></li>
@@ -41,7 +41,7 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li><Link href="/tpa" className="hover:text-white transition-colors">TPA/TPQ</Link></li>
               <li><Link href="/zakat" className="hover:text-white transition-colors">Zakat & Infaq</Link></li>
-              <li><Link href="/pernikahan" className="hover:text-white transition-colors">Pernikahan</Link></li>
+              <li><Link href="/Alquran" className="hover:text-white transition-colors">Alquran Online</Link></li>
               <li><Link href="/sosial" className="hover:text-white transition-colors">Kegiatan Sosial</Link></li>
               <li><Link href="/tahfiz" className="hover:text-white transition-colors">Tahfiz Book</Link></li>
             </ul>

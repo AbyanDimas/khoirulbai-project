@@ -280,9 +280,9 @@ const Beranda = () => {
       icon: (
         <BookCheck className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
       ),
-      title: "Pernikahan",
-      description: "Layanan nikah dan konsultasi keluarga",
-      link: "/pernikahan",
+      title: "Alquran Online",
+      description: "Layanan membaca dan menghafal Alquran secara online",
+      link: "/alquran",
     },
     {
       icon: (
@@ -296,8 +296,8 @@ const Beranda = () => {
       icon: (
         <House className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
       ),
-      title: "Wisata Religi",
-      description: "Kunjungan dan studi banding",
+      title: "Rekomendasi Tempat",
+      description: "Tempat-tempat menarik untuk dikunjungi",
       link: "/wisata",
     },
     {
@@ -310,9 +310,9 @@ const Beranda = () => {
       icon: (
         <House className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
       ),
-      title: "Manasik Haji",
-      description: "Latihan ibadah haji untuk calon jamaah",
-      link: "/haji",
+      title: "Galeri Masjid",
+      description: "Foto-foto kegiatan dan suasana masjid",
+      link: "/galeri",
     },
   ];
 
