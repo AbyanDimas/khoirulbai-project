@@ -4,7 +4,6 @@ import {
 } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import Navbar from './components/Navbar/Main'
 import { ThemeProvider } from 'next-themes'
 
 const geistSans = Geist({
@@ -37,7 +36,6 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
             {children}
           </ThemeProvider>
         </body>
