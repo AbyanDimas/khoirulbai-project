@@ -33,7 +33,7 @@ export default async function TafsirPage({
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {tafsir.data.namaLatin}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-100">
                 {tafsir.data.tempatTurun} • {tafsir.data.jumlahAyat} ayat
               </p>
             </div>
@@ -42,14 +42,14 @@ export default async function TafsirPage({
             </p>
           </div>
 
-          <p className="text-gray-700 dark:text-gray-300 mb-4">{tafsir.data.arti}</p>
+          <p className="text-gray-700 dark:text-gray-100 mb-4">{tafsir.data.arti}</p>
           <div
             className="prose prose-sm text-gray-600 dark:text-gray-400 dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: tafsir.data.deskripsi }}
           />
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:text-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
           {tafsir.data.tafsir.map((tafsirItem) => (
             <TafsirItem key={tafsirItem.ayat} tafsir={tafsirItem} />
           ))}

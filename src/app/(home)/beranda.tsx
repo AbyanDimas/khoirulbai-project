@@ -15,6 +15,7 @@ import {
   CloudSun,
   Book,
   House,
+  Newspaper,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnnouncementBar } from "@/app/components/Section/AnnouncementBar";
@@ -258,23 +259,23 @@ const Beranda = () => {
       ),
       title: "Kajian Rutin",
       description: "Pengajian mingguan dan bulanan dengan berbagai tema",
-      link: "/kajian",
+      link: "/agenda",
     },
     {
       icon: (
         <Users className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
       ),
-      title: "TPA/TPQ",
-      description: "Pendidikan Al-Book untuk anak-anak",
-      link: "/tpa",
+      title: "Tausiyah",
+      description: "Kumpulan tausiyah dari para ustadz",
+      link: "/tausiyah",
     },
     {
       icon: (
         <HeartHandshake className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
       ),
-      title: "Zakat & Infaq",
-      description: "Penyaluran zakat, infaq, dan sedekah",
-      link: "/zakat",
+      title: "Donasi",
+      description: "Bantuan donasi untuk pembangunan dan kegiatan masjid",
+      link: "/donasi",
     },
     {
       icon: (
@@ -288,17 +289,17 @@ const Beranda = () => {
       icon: (
         <ScrollText className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
       ),
-      title: "Kegiatan Sosial",
-      description: "Bantuan untuk masyarakat sekitar",
-      link: "/sosial",
+      title: "Zakat Online",
+      description: "Pengelolaan zakat secara online",
+      link: "/zakat-infaq",
     },
     {
       icon: (
-        <House className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+        <Newspaper className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
       ),
-      title: "Rekomendasi Tempat",
-      description: "Tempat-tempat menarik untuk dikunjungi",
-      link: "/wisata",
+      title: "Artikel & Berita",
+      description: "Berita terbaru dan artikel seputar masjid",
+      link: "/berita",
     },
     {
       icon: <Book className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />,
@@ -380,7 +381,7 @@ const Beranda = () => {
       <MosqueServices services={services} />
       <LatestTausyiah />
       <Gallery />
-      <LiveStreaming />
+      {/* <LiveStreaming /> */}
       <LocationMap />
       <CtaSection />
       <Footer />

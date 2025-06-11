@@ -76,8 +76,8 @@ const TausiyahPage = () => {
               month: 'long',
               year: 'numeric'
             }),
-            duration: '15:30', // Default or add duration field in Strapi
-            type: 'video', // Default or add type field in Strapi
+            duration: '-', // Default or add duration field in Strapi
+            type: 'Preview', // Default or add type field in Strapi
             category: 'Kajian', // Default or add category field in Strapi
             views: '1.2K', // Default or add views field in Strapi
             liked: false,
@@ -291,13 +291,6 @@ const TausiyahPage = () => {
                   {tausiyah.image ? (
                     <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${tausiyah.image})` }}>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        {tausiyah.type === 'video' ? (
-                          <PlayCircle className="h-12 w-12 text-white/80 hover:text-white transition-colors" />
-                        ) : tausiyah.type === 'audio' ? (
-                          <Headphones className="h-12 w-12 text-white/80 hover:text-white transition-colors" />
-                        ) : (
-                          <BookOpen className="h-12 w-12 text-white/80 hover:text-white transition-colors" />
-                        )}
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-3">
                         <span className={`text-xs px-2 py-1 rounded ${
