@@ -3,11 +3,13 @@ import { getSurahDetail } from "@/app/services/quran.service";
 import { ChevronLeft, ChevronRight, Play, BookOpen } from "lucide-react";
 import Link from "next/link";
 
-export default async function SurahDetail({
-  params,
-}: {
-  params: { nomor: string };
-}) {
+interface PageProps {
+  params: {
+    nomor: string;
+  };
+}
+
+export default async function SurahDetail({ params }: PageProps) {
   const surah = await getSurahDetail(parseInt(params.nomor));
 
   return (

@@ -9,7 +9,7 @@ const availablePages = [
   { path: '/berita/galeri', name: 'Galeri Berita', description: 'Galeri foto kegiatan' },
   { path: '/jadwal/jumat', name: 'Jadwal Sholat Jumat', description: 'Jadwal khutbah dan imam' },
   { path: '/jadwal/kultum-pengajian', name: 'Jadwal Kultum & Pengajian', description: 'Jadwal kajian rutin' },
-  { path: '/jadwal/terawih', name: 'Jadwal Sholat Terawih', description: 'Jadwal ramadhan' },
+  { path: '/jadwal/jadwal-shalat', name: 'Jadwal Sholat', description: 'Jadwal Sholat' },
   { path: '/laporan/keuangan', name: 'Laporan Keuangan', description: 'Transparansi keuangan masjid' },
   { path: '/laporan/waqaf', name: 'Laporan Waqaf', description: 'Laporan donasi waqaf' },
   { path: '/tausiyah', name: 'Tausiyah', description: 'Artikel islami' },
