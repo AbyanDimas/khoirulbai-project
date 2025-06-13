@@ -91,11 +91,11 @@ const NotFound = () => {
             </Link>
 
             <Link
-              href="/tausyiah"
+              href="/tausiyah"
               className="flex items-center px-4 py-3 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-200"
             >
               <Megaphone className="h-5 w-5 mr-2 text-emerald-600 dark:text-emerald-400" />
-              <span>Tausyiah</span>
+              <span>tausiyah</span>
               <ArrowRight className="h-4 w-4 ml-auto text-gray-400" />
             </Link>
 

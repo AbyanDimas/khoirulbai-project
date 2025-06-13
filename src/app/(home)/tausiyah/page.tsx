@@ -407,7 +407,7 @@ const TausiyahPage = () => {
                 {/* Footer */}
                 <div className="px-5 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600">
                   <Link 
-                    href={`/tausyiah/${tausiyah.id}`}
+                    href={`/tausiyah/${tausiyah.id}`}
                     className="w-full flex items-center justify-center py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors"
                   >
                     Buka {tausiyah.type === 'video' ? 'Video' : tausiyah.type === 'audio' ? 'Audio' : 'Artikel'}

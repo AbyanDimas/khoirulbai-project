@@ -4,16 +4,16 @@ import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Tausyiah } from '@/app/types';
-import { TausyiahCard } from '@/app/components/Section/TausyiahCard';
+import { tausiyah } from '@/app/types';
+import { tausiyahCard } from '@/app/components/Section/tausiyahCard';
 
-export const LatestTausyiah = () => {
-  const [tausyiah, setTausyiah] = useState<Tausyiah[]>([]);
+export const Latesttausiyah = () => {
+  const [tausiyah, settausiyah] = useState<tausiyah[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchLatestTausyiah = async () => {
+    const fetchLatesttausiyah = async () => {
       try {
         setLoading(true);
         const response = await fetch(
@@ -21,12 +21,12 @@ export const LatestTausyiah = () => {
         );
         
         if (!response.ok) {
-          throw new Error('Failed to fetch tausyiah');
+          throw new Error('Failed to fetch tausiyah');
         }
 
         const data = await response.json();
 
-        const formattedTausyiah = data.data.map((item: any) => {
+        const formattedtausiyah = data.data.map((item: any) => {
           let imageUrl = '/placeholder.jpg';
           if (item.attributes.gambar?.data?.attributes?.url) {
             if (item.attributes.gambar.data.attributes.url.startsWith('http')) {
@@ -57,16 +57,16 @@ export const LatestTausyiah = () => {
           };
         });
 
-        setTausyiah(formattedTausyiah);
+        settausiyah(formattedtausiyah);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        console.error('Error fetching tausyiah:', err);
+        console.error('Error fetching tausiyah:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLatestTausyiah();
+    fetchLatesttausiyah();
   }, []);
 
   if (loading) {
@@ -74,7 +74,7 @@ export const LatestTausyiah = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white">Tausyiah Terbaru</h2>
+            <h2 className="text-2xl font-bold dark:text-white">tausiyah Terbaru</h2>
             <p className="text-gray-600 dark:text-gray-400">Kumpulan nasihat dan ceramah terbaru</p>
           </div>
         </div>
@@ -99,7 +99,7 @@ export const LatestTausyiah = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white">Tausyiah Terbaru</h2>
+            <h2 className="text-2xl font-bold dark:text-white">tausiyah Terbaru</h2>
             <p className="text-gray-600 dark:text-gray-400">Kumpulan nasihat dan ceramah terbaru</p>
           </div>
         </div>
@@ -126,24 +126,24 @@ export const LatestTausyiah = () => {
         className="flex justify-between items-center mb-8"
       >
         <div>
-          <h2 className="text-2xl font-bold dark:text-white">Tausyiah Terbaru</h2>
+          <h2 className="text-2xl font-bold dark:text-white">tausiyah Terbaru</h2>
           <p className="text-gray-600 dark:text-gray-400">Kumpulan nasihat dan ceramah terbaru</p>
         </div>
         <Link 
-          href="/tausyiah" 
+          href="/tausiyah" 
           className="flex items-center text-emerald-600 dark:text-emerald-400 hover:underline"
         >
           Lihat semua <ChevronRight className="ml-1" />
         </Link>
       </motion.div>
 
-      {tausyiah.length === 0 ? (
+      {tausiyah.length === 0 ? (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          Tidak ada tausyiah terbaru saat ini
+          Tidak ada tausiyah terbaru saat ini
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tausyiah.map((item, index) => (
+          {tausiyah.map((item, index) => (
             <motion.div
               key={item.id}
               initial={{ y: 20, opacity: 0 }}
@@ -151,7 +151,7 @@ export const LatestTausyiah = () => {
               transition={{ delay: 0.1 * index }}
               viewport={{ once: true }}
             >
-              <TausyiahCard tausyiah={item} index={index} />
+              <tausiyahCard tausiyah={item} index={index} />
             </motion.div>
           ))}
         </div>

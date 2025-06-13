@@ -26,7 +26,7 @@ import { UpcomingEvents } from "@/app/components/Section/UpcomingEvents";
 import { ImportantAnnouncements } from "@/app/components/Section/ImportantAnnouncements";
 import { MosqueStats } from "@/app/components/Section/MosqueStats";
 import { MosqueServices } from "@/app/components/Section/MosqueServices";
-import { LatestTausyiah } from "@/app/components/Section/LatestTausyiah";
+import { Latesttausiyah } from "@/app/components/Section/LatestTausyiah";
 import { Gallery } from "@/app/components/Section/Gallery";
 import { LiveStreaming } from "@/app/components/Section/LiveStreaming";
 import { LocationMap } from "@/app/components/Section/LocationMap";
@@ -39,7 +39,7 @@ import type {
   PrayerSchedule,
   Event,
   Service,
-  Tausyiah,
+  tausiyah,
   GalleryItem,
   Announcement,
   StatItem,
@@ -379,7 +379,7 @@ const Beranda = () => {
       <MosqueStats stats={stats} />
       </div>
       <MosqueServices services={services} />
-      <LatestTausyiah />
+      <Latesttausiyah />
       <Gallery />
       {/* <LiveStreaming /> */}
       <LocationMap />

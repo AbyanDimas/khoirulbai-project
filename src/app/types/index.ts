@@ -28,7 +28,7 @@ export type Service = {
   link: string;
 };
 
-export type Tausyiah = {
+export type tausiyah = {
   id: number;
   title: string;
   description: string;

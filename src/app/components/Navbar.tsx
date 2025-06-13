@@ -193,15 +193,15 @@ const Navbar = () => {
             </div>
 
             <Link 
-              href="/tausyiah" 
+              href="/tausiyah" 
               className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                isActive('/tausyiah') 
+                isActive('/tausiyah') 
                   ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800' 
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
-              <Megaphone className={`h-4 w-4 mr-2 ${isActive('/tausyiah') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
-              Tausyiah
+              <Megaphone className={`h-4 w-4 mr-2 ${isActive('/tausiyah') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
+              tausiyah
             </Link>
 
             {/* Lainnya dropdown */}
@@ -642,16 +642,16 @@ const Navbar = () => {
               </AnimatePresence>
 
               <Link
-                href="/tausyiah"
+                href="/tausiyah"
                 className={`flex items-center px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${
-                  isActive('/tausyiah') 
+                  isActive('/tausiyah') 
                     ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800' 
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
                 onClick={() => setIsOpen(false)}
               >
-                <Megaphone className={`h-5 w-5 mr-3 ${isActive('/tausyiah') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                Tausyiah
+                <Megaphone className={`h-5 w-5 mr-3 ${isActive('/tausiyah') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                tausiyah
               </Link>
 
               <button
