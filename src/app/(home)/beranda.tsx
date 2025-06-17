@@ -44,6 +44,8 @@ import type {
   Announcement,
   StatItem,
 } from "@/app/types";
+import { WelcomeSection } from "../components/Section/Welcome";
+import { HomeWorkProgram } from "../components/Section/WorkProgram";
 
 
 const Beranda = () => {
@@ -372,6 +374,7 @@ const Beranda = () => {
         </motion.div>
       </section>
 
+<WelcomeSection />
 <div className="container mx-auto px-4 py-12">
       <ImportantAnnouncements />
 </div>
@@ -379,6 +382,8 @@ const Beranda = () => {
       <MosqueStats stats={stats} />
       </div>
       <MosqueServices services={services} />
+      <HomeWorkProgram />
+
       <Latesttausiyah />
       <Gallery />
       {/* <LiveStreaming /> */}
