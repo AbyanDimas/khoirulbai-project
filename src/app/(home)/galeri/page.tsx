@@ -44,6 +44,7 @@ const GalleryPage = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showThumbnails, setShowThumbnails] = useState(false)
 
   useEffect(() => {
     const fetchGalleryItems = async () => {
@@ -93,6 +94,23 @@ const GalleryPage = () => {
     fetchGalleryItems()
   }, [])
 
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      } else if (e.key === 'ArrowLeft') {
+        navigateLightbox('prev');
+      } else if (e.key === 'ArrowRight') {
+        navigateLightbox('next');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, selectedItem]);
+
   const filteredItems = galleryItems.filter(item => {
     const matchesCategory = activeCategory === 'Semua' || item.category === activeCategory
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -121,6 +139,38 @@ const GalleryPage = () => {
     }
     
     setSelectedItem(filteredItems[newIndex])
+  }
+
+  const handleDownload = async (url: string, title: string) => {
+    try {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const blobUrl = window.URL.createObjectURL(blob)
+      
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = title || 'download'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      
+      window.URL.revokeObjectURL(blobUrl)
+    } catch (err) {
+      console.error('Error downloading file:', err)
+      alert('Gagal mengunduh file')
+    }
+  }
+
+  const toggleLike = (id: string) => {
+    setGalleryItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { ...item, liked: !item.liked } : item
+      )
+    )
+    
+    if (selectedItem?.id === id) {
+      setSelectedItem(prev => prev ? { ...prev, liked: !prev.liked } : null)
+    }
   }
 
   if (loading) {
@@ -274,6 +324,10 @@ const GalleryPage = () => {
                     <h3 className="font-medium dark:text-white line-clamp-2">{item.title}</h3>
                     <button 
                       className={`p-1 ${item.liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleLike(item.id)
+                      }}
                     >
                       <Heart 
                         size={18} 
@@ -320,7 +374,13 @@ const GalleryPage = () => {
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      <button className="p-1 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
+                      <button 
+                        className="p-1 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDownload(item.url, item.title)
+                        }}
+                      >
                         <Download size={18} />
                       </button>
                       <button className="p-1 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
@@ -328,6 +388,10 @@ const GalleryPage = () => {
                       </button>
                       <button 
                         className={`p-1 ${item.liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleLike(item.id)
+                        }}
                       >
                         <Heart 
                           size={18} 
@@ -337,7 +401,13 @@ const GalleryPage = () => {
                     </div>
                   </div>
                   <div className="mt-3 flex space-x-2">
-                    <button className="text-sm px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full">
+                    <button 
+                      className="text-sm px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openLightbox(item)
+                      }}
+                    >
                       Lihat Detail
                     </button>
                   </div>
@@ -386,45 +456,37 @@ const GalleryPage = () => {
               <ChevronRight size={32} />
             </button>
             
-            <div className="relative max-w-4xl w-full max-h-[90vh]">
+            <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col">
               <motion.div
                 key={selectedItem.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
-                className="bg-black rounded-lg overflow-hidden"
+                className="bg-black rounded-lg overflow-hidden flex-grow flex flex-col"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="aspect-video bg-gray-800 flex items-center justify-center relative">
-                  <img
-                    src={selectedItem.url}
-                    alt={selectedItem.title}
-                    className="absolute inset-0 w-full h-full object-contain"
-                  />
-                  {selectedItem.type === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="32"
-                          height="32"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-white ml-1"
-                        >
-                          <polygon points="5 3 19 12 5 21 5 3" />
-                        </svg>
-                      </div>
-                    </div>
+                <div className="aspect-video bg-gray-800 flex items-center justify-center relative flex-grow">
+                  {selectedItem.type === 'image' ? (
+                    <img
+                      src={selectedItem.url}
+                      alt={selectedItem.title}
+                      className="absolute inset-0 w-full h-full object-contain"
+                    />
+                  ) : (
+                    <video
+                      src={selectedItem.url}
+                      controls
+                      className="absolute inset-0 w-full h-full object-contain"
+                    />
                   )}
                 </div>
                 
-                <div className="p-4 bg-gray-900 text-white">
+                <div 
+                  className="p-4 bg-gray-900 text-white relative"
+                  onMouseEnter={() => setShowThumbnails(true)}
+                  onMouseLeave={() => setShowThumbnails(false)}
+                >
                   <div className="flex justify-between items-center">
                     <div>
                       <h3 className="text-lg font-medium">{selectedItem.title}</h3>
@@ -434,13 +496,25 @@ const GalleryPage = () => {
                       )}
                     </div>
                     <div className="flex space-x-3">
-                      <button className="hover:text-emerald-400">
+                      <button 
+                        className="hover:text-emerald-400"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDownload(selectedItem.url, selectedItem.title)
+                        }}
+                      >
                         <Download size={20} />
                       </button>
                       <button className="hover:text-emerald-400">
                         <Share2 size={20} />
                       </button>
-                      <button className={`${selectedItem.liked ? 'text-red-500' : 'hover:text-red-500'}`}>
+                      <button 
+                        className={`${selectedItem.liked ? 'text-red-500' : 'hover:text-red-500'}`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleLike(selectedItem.id)
+                        }}
+                      >
                         <Heart 
                           size={20} 
                           fill={selectedItem.liked ? 'currentColor' : 'none'} 
@@ -448,6 +522,58 @@ const GalleryPage = () => {
                       </button>
                     </div>
                   </div>
+
+                  {/* Thumbnail previews - only shown when hovering bottom area */}
+                  <AnimatePresence>
+                    {(showThumbnails && filteredItems.length > 1) && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute left-0 right-0 bottom-full pb-2 bg-gradient-to-t from-black/90 to-transparent"
+                      >
+                        <div className="flex overflow-x-auto space-x-3 py-2 px-4">
+                          {filteredItems.map((item) => (
+                            <motion.div
+                              key={item.id}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden cursor-pointer relative transition-all duration-200 ${selectedItem.id === item.id ? 'ring-2 ring-emerald-500 transform scale-105' : 'opacity-70 hover:opacity-100'}`}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedItem(item)
+                              }}
+                            >
+                              <img
+                                src={item.url}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
+                              {item.type === 'video' && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="text-white"
+                                  >
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                  </svg>
+                                </div>
+                              )}
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </motion.div>
             </div>

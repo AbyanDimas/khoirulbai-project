@@ -16,7 +16,7 @@ export const UpcomingEvents = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/agenda?populate=*&sort[0]=tanggal_mulai:asc&pagination[limit]=3`
+          `${process.env.NEXT_PUBLIC_API_URL}/agenda?populate=*&sort[0]=tanggal_mulai:asc&pagination[limit]=5`
         );
         
         if (!response.ok) {

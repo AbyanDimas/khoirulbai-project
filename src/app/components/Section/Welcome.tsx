@@ -8,7 +8,7 @@ export const WelcomeSection = () => {
     <section className="py-12 md:py-16 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
-          {/* Bagian Gambar Profil - Dioptimalkan */}
+          {/* Bagian Gambar Profil */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -27,14 +27,13 @@ export const WelcomeSection = () => {
                 quality={85}
               />
             </div>
-            {/* Tambahan informasi ketua di bawah gambar */}
             <div className="mt-4 text-center lg:text-left">
               <h4 className="font-bold text-lg dark:text-white">Nama Ketua Masjid</h4>
               <p className="text-gray-600 dark:text-gray-400">Ketua Takmir Masjid Khoirul Ba'i</p>
             </div>
           </motion.div>
 
-          {/* Bagian Sambutan - Dioptimalkan untuk mobile */}
+          {/* Bagian Sambutan dengan card rounded untuk mobile */}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -53,7 +52,56 @@ export const WelcomeSection = () => {
               Assalamu'alaikum Warahmatullahi Wabarakatuh
             </h3>
             
-            <div className="space-y-4 text-gray-700 dark:text-gray-300 mb-6">
+            {/* Container untuk mobile dengan card rounded */}
+            <div className="md:hidden space-y-3 mb-6">
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                <p className="text-gray-700 dark:text-gray-300">Assalamu'alaikum wr wb</p>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                <p className="text-gray-700 dark:text-gray-300">
+                  Segala Puja dan puji hanya milik Allah SWT Tuhan pencipta Alam Raya yang telah memberikan 
+                  limpahan Rahmat Karunia dan Nikmat yang tak terhingga. Shalawat dan salam semoga senantiasa 
+                  Allah SWT curahkan kepada Rasulullah SAW beserta keluarga para sahabat dan orang orang yang 
+                  istiqamah menghidupkan Sunnah Sunah nya.
+                </p>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                <p className="text-gray-700 dark:text-gray-300">
+                  Masjid adalah pusat peradaban, fungsi masjid dibangun tidak hanya sebagai tempat ibadah mahdhoh. 
+                  Rasulullah SAW prioritas utama membangun peradaban umat manusia adalah membangun Masjid Nabawi 
+                  kemudian menjadikan Masjid sebagai pusat kegiatan ibadah, pendidikan, dakwah, sosial dan riyadhoh. 
+                  Berawal dari Masjid Rasulullah merubah peradaban manusia "minna dhumati ila Nur" dari peradaban 
+                  jahiliyah kepada peradaban Islam yang penuh cahaya.
+                </p>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                <p className="text-gray-700 dark:text-gray-300">
+                  Sesungguhnya orang orang yang pantas memakmurkan masjid adalah orang orang yang beriman kepada 
+                  Allah SWT dan hari akhir serta tetap mendirikan sholat menunaikan zakat dan tidak takut kepada 
+                  siapa saja kecuali kepada Allah SWT. (Qs. At Taubah 18). Berangkat dari sini marilah dengan Hati 
+                  yang bersih dan keihlasan kita bersama sama bangun karakter siswa siswa kita dari Masjid. Membentuk 
+                  pribadi yang religius, cerdas, tangkas dan inovatif.
+                </p>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                <p className="text-gray-700 dark:text-gray-300">
+                  Teriring ucapan terima kasih yang mendalam atas kesediaan dan keihlasan Bapak/Ibu menjadi pengurus 
+                  Masjid Khoirul Ba'i, hanya kepada Allah SWT kita berharap dan hanya kepada Allah kembali semua urusan. 
+                  Kritik saran dan perbaikan kami harapkan. Mohon maaf atas segala kekurangan.
+                </p>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                <p className="text-gray-700 dark:text-gray-300">Wassalamualaikum wr. wb.</p>
+              </div>
+            </div>
+
+            {/* Container untuk desktop (tampilan normal) */}
+            <div className="hidden md:block space-y-4 text-gray-700 dark:text-gray-300 mb-6">
               <p>Assalamu'alaikum wr wb</p>
               
               <p>

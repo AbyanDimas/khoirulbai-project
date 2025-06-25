@@ -1,9 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { CalendarDays, Clock, MapPin, ChevronRight, Users, BookOpen, House, MoonStar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CalendarDays, Clock, MapPin, ChevronRight, Users, Info, X } from 'lucide-react';
 import Link from 'next/link';
 import { JSX, useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 type AgendaItem = {
   id: string;
@@ -15,29 +16,31 @@ type AgendaItem = {
   category: string;
   color: string;
   icon: JSX.Element;
+  startTime: string;
+  endTime: string;
 };
 
 const categoryColors = {
-  sholat: "bg-blue-600 dark:bg-blue-300",
-  pengajian: "bg-green-600 dark:bg-green-300",
-  event: "bg-purple-600 dark:bg-purple-300",
-  belajar: "bg-amber-600 dark:bg-amber-300",
+  sholat: "bg-emerald-600 dark:bg-emerald-300",
+  pengajian: "bg-emerald-600 dark:bg-emerald-300",
+  event: "bg-emerald-600 dark:bg-emerald-300",
+  belajar: "bg-emerald-600 dark:bg-emerald-300",
   ramadhan: "bg-emerald-600 dark:bg-emerald-300"
 };
 
 const categoryIcons = {
-  sholat: <House className="w-6 h-6 text-blue-600 dark:text-blue-300" />,
-  pengajian: <BookOpen className="w-6 h-6 text-green-600 dark:text-green-300" />,
-  event: <MoonStar className="w-6 h-6 text-purple-600 dark:text-purple-300" />,
-  belajar: <BookOpen className="w-6 h-6 text-amber-600 dark:text-amber-300" />,
-  ramadhan: <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
+  sholat: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+  pengajian: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+  event: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+  belajar: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+  ramadhan: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
 };
 
 const categoryBackgrounds = {
-  sholat: "bg-blue-100 dark:bg-blue-900",
-  pengajian: "bg-green-100 dark:bg-green-900",
-  event: "bg-purple-100 dark:bg-purple-900",
-  belajar: "bg-amber-100 dark:bg-amber-900",
+  sholat: "bg-emerald-100 dark:bg-emerald-900",
+  pengajian: "bg-emerald-100 dark:bg-emerald-900",
+  event: "bg-emerald-100 dark:bg-emerald-900",
+  belajar: "bg-emerald-100 dark:bg-emerald-900",
   ramadhan: "bg-emerald-100 dark:bg-emerald-900"
 };
 
@@ -45,6 +48,7 @@ export default function Agenda() {
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<AgendaItem | null>(null);
 
   useEffect(() => {
     const fetchAgendaItems = async () => {
@@ -57,7 +61,6 @@ export default function Agenda() {
         const data = await response.json();
 
         const formattedItems = data.data.map((item: any) => {
-          // Determine category based on tag_kegiatan or default to 'event'
           const category = item.attributes.tag_kegiatan?.toLowerCase() || 'event';
           const normalizedCategory = Object.keys(categoryColors).includes(category) 
             ? category 
@@ -85,7 +88,9 @@ export default function Agenda() {
             location: item.attributes.lokasi || 'Lokasi tidak ditentukan',
             category: normalizedCategory,
             color: categoryBackgrounds[normalizedCategory as keyof typeof categoryBackgrounds],
-            icon: categoryIcons[normalizedCategory as keyof typeof categoryIcons]
+            icon: categoryIcons[normalizedCategory as keyof typeof categoryIcons],
+            startTime: startDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            endTime: endDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
           };
         });
 
@@ -132,7 +137,7 @@ export default function Agenda() {
   }
 
   return (
-    <section className="container mx-auto px-4 py-12">
+    <section className="container mx-auto px-4 py-12 relative">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -195,7 +200,9 @@ export default function Agenda() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold dark:text-white">{event.title}</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{event.description}</p>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                      <ReactMarkdown>{event.description}</ReactMarkdown>
+                    </div>
                   </div>
                 </div>
                 
@@ -207,8 +214,7 @@ export default function Agenda() {
                   <div className="flex items-center">
                     <Clock className="h-5 w-5 text-gray-600 dark:text-gray-300 mr-2" />
                     <span className="dark:text-white text-sm">
-                      {new Date(event.startDate).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} - {' '}
-                      {new Date(event.endDate).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      {event.startTime} - {event.endTime}
                     </span>
                   </div>
                   <div className="flex items-center">
@@ -218,12 +224,12 @@ export default function Agenda() {
                 </div>
 
                 <div className="mt-6 flex justify-between items-center">
-                  <Link 
-                    href={`/agenda/${event.id}`}
+                  <button 
+                    onClick={() => setSelectedItem(event)}
                     className="text-sm flex items-center text-emerald-600 dark:text-emerald-400 hover:underline"
                   >
                     Detail kegiatan <ChevronRight className="ml-1 h-4 w-4" />
-                  </Link>
+                  </button>
                   <button className="text-sm px-3 py-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     Reminder
                   </button>
@@ -263,6 +269,85 @@ export default function Agenda() {
           </div>
         </div>
       </motion.div>
+
+      {/* Overlay for detail view */}
+      <AnimatePresence>
+        {selectedItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedItem(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-emerald-600 dark:bg-emerald-700 p-6 text-white sticky top-0 z-10">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-lg bg-white/20">
+                      <Info className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <h1 className="text-2xl font-bold">{selectedItem.title}</h1>
+                      <p className="text-emerald-100">{selectedItem.category}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedItem(null)}
+                    className="p-2 rounded-full hover:bg-white/20 transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="prose dark:prose-invert max-w-none mb-8">
+                  <ReactMarkdown>{selectedItem.description}</ReactMarkdown>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-lg p-4">
+                    <h3 className="font-medium text-lg mb-3 dark:text-white">Detail Waktu</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <CalendarDays className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
+                        <span className="dark:text-white">{selectedItem.startDate}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
+                        <span className="dark:text-white">
+                          {selectedItem.startTime} - {selectedItem.endTime}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-lg p-4">
+                    <h3 className="font-medium text-lg mb-3 dark:text-white">Lokasi</h3>
+                    <div className="flex items-center">
+                      <MapPin className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
+                      <span className="dark:text-white">{selectedItem.location}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+                    Set Reminder
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

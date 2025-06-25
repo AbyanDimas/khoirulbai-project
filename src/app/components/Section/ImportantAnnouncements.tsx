@@ -16,7 +16,7 @@ export const ImportantAnnouncements = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/pengunguman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=3`
+          `${process.env.NEXT_PUBLIC_API_URL}/pengunguman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=5`
         );
         
         if (!response.ok) {
@@ -29,11 +29,6 @@ export const ImportantAnnouncements = () => {
           id: item.id.toString(),
           title: item.attributes.nama,
           content: item.attributes.deskripsi || 'Tidak ada deskripsi',
-          date: new Date(item.attributes.tanggal).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-          }),
           important: true // Since all from this endpoint are important
         }));
 
@@ -128,9 +123,6 @@ export const ImportantAnnouncements = () => {
                     <h3 className="font-bold dark:text-white">{announcement.title}</h3>
                     <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{announcement.content}</p>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2">
-                    {announcement.date}
-                  </span>
                 </div>
               </motion.div>
             ))}
