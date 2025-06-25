@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -18,6 +18,9 @@ import {
   Link as LinkIcon,
   CalendarDays,
   Image as ImageIcon,
+  Copy,
+  Check,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -51,102 +54,105 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
   const [relatedNews, setRelatedNews] = useState<any[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageError, setImageError] = useState(false);
+  const [showShareOverlay, setShowShareOverlay] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [slug, setSlug] = useState<string>("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+    if (params) {
+      setSlug(params.id);
+      fetchData(params.id);
+    }
+  }, [params]);
 
-        // Fetch main news
-        const newsResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$eq]=${params.id}&populate=*`
-        );
-        const newsData = await newsResponse.json();
+  const fetchData = async (id: string) => {
+    try {
+      setLoading(true);
 
-        if (newsData.data.length > 0) {
-          const newsItem = newsData.data[0].attributes;
-          let imageUrl = null;
-          
-          if (newsItem.image?.data?.attributes?.url) {
-            // Handle both absolute and relative URLs
-            if (newsItem.image.data.attributes.url.startsWith('http')) {
-              imageUrl = newsItem.image.data.attributes.url;
-            } else {
-              imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${newsItem.image.data.attributes.url}`;
-            }
+      // Fetch main news
+      const newsResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$eq]=${id}&populate=*`
+      );
+      const newsData = await newsResponse.json();
+
+      if (newsData.data.length > 0) {
+        const newsItem = newsData.data[0].attributes;
+        let imageUrl = null;
+
+        if (newsItem.image?.data?.attributes?.url) {
+          if (newsItem.image.data.attributes.url.startsWith("http")) {
+            imageUrl = newsItem.image.data.attributes.url;
+          } else {
+            imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${newsItem.image.data.attributes.url}`;
           }
-
-          // Process content to handle newlines
-const processedContent = newsItem.content
-  .split('\n\n')
-.map((paragraph: string) => `<p style="margin-bottom: 1em">${paragraph}</p>`)
-  .join('');
-
-
-          const formattedNews = {
-            id: params.id,
-            title: newsItem.name,
-            content: processedContent,
-            category: newsItem.category,
-            date: new Date(newsItem.createdAt).toLocaleDateString("id-ID", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }),
-            time: new Date(newsItem.waktu).toLocaleTimeString("id-ID", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            author: "Tim Media Masjid",
-            location: "Masjid Khoerul Ba'i",
-            images: imageUrl
-              ? [
-                  {
-                    url: imageUrl,
-                    alt:
-                      newsItem.image.data.attributes.alternativeText ||
-                      newsItem.name,
-                  },
-                ]
-              : [],
-                relatedNews: [], // Tambahkan ini!
-
-          };
-
-          setBerita(formattedNews);
-
-          // Fetch related news with images
-          const relatedResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$ne]=${params.id}&pagination[limit]=3&populate=*`
-          );
-          const relatedData = await relatedResponse.json();
-
-          const formattedRelated = relatedData.data.map((item: any) => ({
-            id: item.id.toString(),
-            title: item.attributes.name,
-            date: new Date(item.attributes.createdAt).toLocaleDateString(
-              "id-ID"
-            ),
-            category: item.attributes.category,
-            slug: item.attributes.slug,
-            image: item.attributes.image?.data?.attributes?.url
-              ? item.attributes.image.data.attributes.url.startsWith("http")
-                ? item.attributes.image.data.attributes.url
-                : `${process.env.NEXT_PUBLIC_API_URL}${item.attributes.image.data.attributes.url}`
-              : null,
-          }));
-
-          setRelatedNews(formattedRelated);
         }
-      } catch (error) {
-        console.error("Error fetching news:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchData();
-  }, [params.id]);
+        const processedContent = newsItem.content
+          .split("\n\n")
+          .map(
+            (paragraph: string) =>
+              `<p style="margin-bottom: 1em">${paragraph}</p>`
+          )
+          .join("");
+
+        const formattedNews = {
+          id: id,
+          title: newsItem.name,
+          content: processedContent,
+          category: newsItem.category,
+          date: new Date(newsItem.createdAt).toLocaleDateString("id-ID", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          time: new Date(newsItem.waktu).toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          author: "Tim Media Masjid",
+          location: "Masjid Khoerul Ba'i",
+          images: imageUrl
+            ? [
+                {
+                  url: imageUrl,
+                  alt:
+                    newsItem.image.data.attributes.alternativeText ||
+                    newsItem.name,
+                },
+              ]
+            : [],
+          relatedNews: [],
+        };
+
+        setBerita(formattedNews);
+
+        // Fetch related news with images
+        const relatedResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$ne]=${id}&pagination[limit]=3&populate=*`
+        );
+        const relatedData = await relatedResponse.json();
+
+        const formattedRelated = relatedData.data.map((item: any) => ({
+          id: item.id.toString(),
+          title: item.attributes.name,
+          date: new Date(item.attributes.createdAt).toLocaleDateString("id-ID"),
+          category: item.attributes.category,
+          slug: item.attributes.slug,
+          image: item.attributes.image?.data?.attributes?.url
+            ? item.attributes.image.data.attributes.url.startsWith("http")
+              ? item.attributes.image.data.attributes.url
+              : `${process.env.NEXT_PUBLIC_API_URL}${item.attributes.image.data.attributes.url}`
+            : null,
+        }));
+
+        setRelatedNews(formattedRelated);
+      }
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNextImage = () => {
     if (berita?.images) {
@@ -166,7 +172,8 @@ const processedContent = newsItem.content
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Link berhasil disalin!");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (loading) {
@@ -247,7 +254,10 @@ const processedContent = newsItem.content
               <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
                 <Bookmark size={20} />
               </button>
-              <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
+              <button
+                className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400"
+                onClick={() => setShowShareOverlay(true)}
+              >
                 <Share2 size={20} />
               </button>
               <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
@@ -377,7 +387,7 @@ const processedContent = newsItem.content
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.onerror = null;
-                      target.src = '/placeholder-image.jpg';
+                      target.src = "/placeholder-image.jpg";
                     }}
                   />
                 </button>
@@ -396,42 +406,63 @@ const processedContent = newsItem.content
             Bagikan Artikel Ini
           </h3>
           <div className="flex flex-wrap gap-3">
-            <motion.button
-              whileHover={{ y: -2 }}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-full text-sm"
-            >
-              <Facebook size={16} className="mr-2" />
-              Facebook
-            </motion.button>
-            <motion.button
-              whileHover={{ y: -2 }}
-              className="flex items-center px-4 py-2 bg-sky-500 text-white rounded-full text-sm"
-            >
-              <Twitter size={16} className="mr-2" />
-              Twitter
-            </motion.button>
-            <motion.button
-              whileHover={{ y: -2 }}
-              className="flex items-center px-4 py-2 bg-green-500 text-white rounded-full text-sm"
-            >
-              <MessageCircle size={16} className="mr-2" />
-              WhatsApp
-            </motion.button>
-            <motion.button
-              whileHover={{ y: -2 }}
-              className="flex items-center px-4 py-2 bg-blue-700 text-white rounded-full text-sm"
-            >
-              <Linkedin size={16} className="mr-2" />
-              LinkedIn
-            </motion.button>
-            <motion.button
-              whileHover={{ y: -2 }}
-              onClick={copyToClipboard}
-              className="flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-full text-sm"
-            >
-              <LinkIcon size={16} className="mr-2" />
-              Salin Link
-            </motion.button>
+            <div className="grid grid-cols-4 gap-4 ">
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                  window.location.href
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mb-1">
+                  <Facebook size={24} className="text-white" />
+                </div>
+                <span className="text-xs dark:text-gray-300">Facebook</span>
+              </a>
+
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                  window.location.href
+                )}&text=${encodeURIComponent(berita.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center mb-1">
+                  <Twitter size={24} className="text-white" />
+                </div>
+                <span className="text-xs dark:text-gray-300">Twitter</span>
+              </a>
+
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `${berita.title} - ${window.location.href}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-1">
+                  <MessageCircle size={24} className="text-white" />
+                </div>
+                <span className="text-xs dark:text-gray-300">WhatsApp</span>
+              </a>
+
+              <a
+                href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+                  window.location.href
+                )}&title=${encodeURIComponent(berita.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-blue-700 flex items-center justify-center mb-1">
+                  <Linkedin size={24} className="text-white" />
+                </div>
+                <span className="text-xs dark:text-gray-300">LinkedIn</span>
+              </a>
+            </div>
           </div>
         </motion.div>
 
@@ -454,45 +485,19 @@ const processedContent = newsItem.content
               placeholder="Tulis komentar Anda..."
               className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
               rows={3}
-              disabled={true} // Disable textarea for now
+              disabled={true}
             />
             <div className="flex justify-end mt-2">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-sm"
-                disabled={true} // Disable button for now
+                disabled={true}
               >
                 Kirim Komentar
               </motion.button>
             </div>
           </div>
-
-          {/* <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow mb-3">
-            <div className="flex items-start">
-              <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-700 mr-3"></div>
-              <div>
-                <div className="flex items-center">
-                  <h4 className="font-bold dark:text-white mr-2">
-                    Ahmad Surya
-                  </h4>
-                  <span className="text-xs text-gray-500">2 hari lalu</span>
-                </div>
-                <p className="text-gray-700 dark:text-gray-300 mt-1">
-                  Pengajian yang sangat bermanfaat, semoga diadakan rutin setiap
-                  bulan dengan tema-tema aktual seperti ini.
-                </p>
-                <div className="flex items-center mt-2">
-                  <button className="flex items-center text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 text-sm mr-4">
-                    <ThumbsUp size={14} className="mr-1" />8
-                  </button>
-                  <button className="text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 text-sm">
-                    Balas
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </motion.div>
 
         <motion.div
@@ -523,7 +528,7 @@ const processedContent = newsItem.content
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.onerror = null;
-                          target.src = '/placeholder-image.jpg';
+                          target.src = "/placeholder-image.jpg";
                         }}
                       />
                     </div>
@@ -549,6 +554,154 @@ const processedContent = newsItem.content
           </div>
         </motion.div>
       </main>
+
+      {/* Share Overlay */}
+      <AnimatePresence>
+        {showShareOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowShareOverlay(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold dark:text-white">
+                  Bagikan Berita
+                </h3>
+                <button
+                  onClick={() => setShowShareOverlay(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  {berita.images.length > 0 && !imageError ? (
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                      <Image
+                        src={berita.images[0].url}
+                        alt={berita.images[0].alt || berita.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                      <ImageIcon size={24} className="text-gray-400" />
+                    </div>
+                  )}
+                  <div>
+                    <h4 className="font-medium dark:text-white line-clamp-2">
+                      {berita.title}
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {berita.category}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                    <div className="flex-1 truncate text-sm dark:text-gray-200">
+                      {window.location.href}
+                    </div>
+                    <button
+                      onClick={copyToClipboard}
+                      className="ml-2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                      title="Salin link"
+                    >
+                      {copied ? (
+                        <Check
+                          size={18}
+                          className="text-emerald-600 dark:text-emerald-400"
+                        />
+                      ) : (
+                        <Copy
+                          size={18}
+                          className="text-gray-500 dark:text-gray-400"
+                        />
+                      )}
+                    </button>
+                  </div>
+                  {copied && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                      Link berhasil disalin!
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-4">
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                    window.location.href
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mb-1">
+                    <Facebook size={24} className="text-white" />
+                  </div>
+                  <span className="text-xs dark:text-gray-300">Facebook</span>
+                </a>
+
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                    window.location.href
+                  )}&text=${encodeURIComponent(berita.title)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center mb-1">
+                    <Twitter size={24} className="text-white" />
+                  </div>
+                  <span className="text-xs dark:text-gray-300">Twitter</span>
+                </a>
+
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `${berita.title} - ${window.location.href}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-1">
+                    <MessageCircle size={24} className="text-white" />
+                  </div>
+                  <span className="text-xs dark:text-gray-300">WhatsApp</span>
+                </a>
+
+                <a
+                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+                    window.location.href
+                  )}&title=${encodeURIComponent(berita.title)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-blue-700 flex items-center justify-center mb-1">
+                    <Linkedin size={24} className="text-white" />
+                  </div>
+                  <span className="text-xs dark:text-gray-300">LinkedIn</span>
+                </a>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

@@ -21,9 +21,23 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  Copy,
+  Check
 } from 'lucide-react'
 import Image from 'next/image'
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+  TelegramShareButton,
+  EmailShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  WhatsappIcon,
+  TelegramIcon,
+  EmailIcon
+} from 'react-share'
 
 type BeritaItem = {
   id: string
@@ -57,6 +71,8 @@ const Berita = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [showShareMenu, setShowShareMenu] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const fetchBerita = async () => {
@@ -114,7 +130,6 @@ const Berita = () => {
         item.content.toLowerCase().includes(searchQuery.toLowerCase()))
     : filteredBerita
 
-  // Pagination logic
   const paginatedBerita = searchedBerita.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -123,6 +138,21 @@ const Berita = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const toggleShareMenu = (id: string) => {
+    setShowShareMenu(showShareMenu === id ? null : id)
+    setCopied(false)
+  }
+
+  const getShareUrl = (slug: string) => {
+    return `${window.location.origin}/berita/${slug}`
+  }
+
+  const copyToClipboard = (slug: string) => {
+    navigator.clipboard.writeText(getShareUrl(slug))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   const renderPagination = () => {
@@ -145,7 +175,6 @@ const Berita = () => {
       }
     }
 
-    // First page
     if (startPage > 1) {
       pages.push(
         <button
@@ -161,7 +190,6 @@ const Berita = () => {
       }
     }
 
-    // Middle pages
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <button
@@ -174,7 +202,6 @@ const Berita = () => {
       )
     }
 
-    // Last page
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
         pages.push(<span key="end-ellipsis" className="px-2">...</span>)
@@ -357,14 +384,17 @@ const Berita = () => {
                       >
                         Baca selengkapnya
                       </Link>
-                      <div className="flex space-x-2">
-                        <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                          <Bookmark size={18} />
-                        </button>
-                        <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                          <Share2 size={18} />
-                        </button>
-                      </div>
+<div className="flex justify-end mt-2">
+  <div className="relative">
+    <button
+      className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+      onClick={() => toggleShareMenu(item.id)}
+    >
+      <Share2 size={15} />
+      <span className="text-sm font-medium">Bagikan</span>
+    </button>
+  </div>
+</div>
                     </div>
                   </div>
                 </motion.div>
@@ -430,6 +460,17 @@ const Berita = () => {
                       <Clock size={12} className="mr-1" />
                       {item.createdAt}
                     </div>
+<div className="flex justify-end mt-2">
+  <div className="relative">
+    <button
+      className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+      onClick={() => toggleShareMenu(item.id)}
+    >
+      <Share2 size={15} />
+      <span className="text-sm font-medium">Bagikan</span>
+    </button>
+  </div>
+</div>
                   </div>
                 </motion.div>
               ))}
@@ -517,17 +558,17 @@ const Berita = () => {
                             <Clock size={12} className="mr-1" />
                             {item.createdAt}
                           </div>
-                          <div className="flex space-x-2">
-                            <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                              <Bookmark size={16} />
-                            </button>
-                            <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                              <Share2 size={16} />
-                            </button>
-                            <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                              <MoreHorizontal size={16} />
-                            </button>
-                          </div>
+<div className="flex justify-end mt-2">
+  <div className="relative">
+    <button
+      className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+      onClick={() => toggleShareMenu(item.id)}
+    >
+      <Share2 size={15} />
+      <span className="text-sm font-medium">Bagikan</span>
+    </button>
+  </div>
+</div>
                         </div>
                       </div>
                     </motion.div>
@@ -540,6 +581,131 @@ const Berita = () => {
           )}
         </div>
       </main>
+
+      {/* Share Overlay */}
+      <AnimatePresence>
+        {showShareMenu && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowShareMenu(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold dark:text-white">Bagikan</h3>
+                <button 
+                  onClick={() => setShowShareMenu(null)}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {berita.filter(item => item.id === showShareMenu).map(item => (
+                <div key={item.id}>
+                  <div className="flex items-center space-x-4 mb-6">
+                    {item.image ? (
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <ImageIcon size={24} className="text-gray-400" />
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-medium dark:text-white line-clamp-2">{item.title}</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{item.category}</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                      <div className="flex-1 truncate text-sm dark:text-gray-200">
+                        {getShareUrl(item.slug)}
+                      </div>
+                      <button 
+                        onClick={() => copyToClipboard(item.slug)}
+                        className="ml-2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                        title="Salin link"
+                      >
+                        {copied ? (
+                          <Check size={18} className="text-emerald-600 dark:text-emerald-400" />
+                        ) : (
+                          <Copy size={18} className="text-gray-500 dark:text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-5 gap-4">
+                    <FacebookShareButton 
+                      url={getShareUrl(item.slug)} 
+                      quote={item.title}
+                      className="flex flex-col items-center"
+                    >
+                      <FacebookIcon size={48} round />
+                      <span className="text-xs mt-2 dark:text-gray-300">Facebook</span>
+                    </FacebookShareButton>
+                    
+                    <TwitterShareButton 
+                      url={getShareUrl(item.slug)} 
+                      title={item.title}
+                      className="flex flex-col items-center"
+                    >
+                      <TwitterIcon size={48} round />
+                      <span className="text-xs mt-2 dark:text-gray-300">Twitter</span>
+                    </TwitterShareButton>
+                    
+                    <WhatsappShareButton 
+                      url={getShareUrl(item.slug)} 
+                      title={item.title}
+                      className="flex flex-col items-center"
+                    >
+                      <WhatsappIcon size={48} round />
+                      <span className="text-xs mt-2 dark:text-gray-300">WhatsApp</span>
+                    </WhatsappShareButton>
+                    
+                    <TelegramShareButton 
+                      url={getShareUrl(item.slug)} 
+                      title={item.title}
+                      className="flex flex-col items-center"
+                    >
+                      <TelegramIcon size={48} round />
+                      <span className="text-xs mt-2 dark:text-gray-300">Telegram</span>
+                    </TelegramShareButton>
+                    
+                    <EmailShareButton 
+                      url={getShareUrl(item.slug)} 
+                      subject={item.title}
+                      body={`Lihat berita ini: ${item.title}`}
+                      className="flex flex-col items-center"
+                    >
+                      <EmailIcon size={48} round />
+                      <span className="text-xs mt-2 dark:text-gray-300">Email</span>
+                    </EmailShareButton>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
