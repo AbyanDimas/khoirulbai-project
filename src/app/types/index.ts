@@ -41,6 +41,7 @@ export type tausiyah = {
   image: string;
 };
 
+
 export type GalleryItem = {
   id: number;
   title: string;
@@ -62,4 +63,14 @@ export type StatItem = {
   name: string;
   value: string;
   icon: JSX.Element;
+};
+
+export interface Berita {
+  id: string;
+  title: string;
+  content: string;
+  slug: string;
+  date: string;
+  category: string;
+  image: string;
 };

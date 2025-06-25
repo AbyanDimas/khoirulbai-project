@@ -17,7 +17,11 @@ import {
   Film,
   Music,
   BookOpen,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -43,12 +47,16 @@ const categories = [
   { name: 'Artikel', icon: <BookOpen size={16} /> }
 ]
 
+const ITEMS_PER_PAGE = 21;
+
 const Berita = () => {
   const [activeCategory, setActiveCategory] = useState('Semua')
   const [berita, setBerita] = useState<BeritaItem[]>([])
   const [loading, setLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
     const fetchBerita = async () => {
@@ -71,7 +79,7 @@ const Berita = () => {
             id: item.id.toString(),
             title: item.attributes.name,
             content: item.attributes.content,
-            category: item.attributes.category,
+            category: item.attributes.category || 'Berita',
             createdAt: new Date(item.attributes.createdAt).toLocaleDateString('id-ID'),
             slug: item.attributes.slug,
             image: imageUrl,
@@ -81,6 +89,7 @@ const Berita = () => {
         })
         
         setBerita(formattedBerita)
+        setTotalPages(Math.ceil(formattedBerita.length / ITEMS_PER_PAGE))
       } catch (error) {
         console.error('Error fetching news:', error)
       } finally {
@@ -104,6 +113,119 @@ const Berita = () => {
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.content.toLowerCase().includes(searchQuery.toLowerCase()))
     : filteredBerita
+
+  // Pagination logic
+  const paginatedBerita = searchedBerita.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const renderPagination = () => {
+    if (searchedBerita.length <= ITEMS_PER_PAGE) return null
+
+    const pages = []
+    const maxVisiblePages = 5
+    let startPage = 1
+    let endPage = totalPages
+
+    if (totalPages > maxVisiblePages) {
+      const half = Math.floor(maxVisiblePages / 2)
+      if (currentPage <= half + 1) {
+        endPage = maxVisiblePages
+      } else if (currentPage >= totalPages - half) {
+        startPage = totalPages - maxVisiblePages + 1
+      } else {
+        startPage = currentPage - half
+        endPage = currentPage + half
+      }
+    }
+
+    // First page
+    if (startPage > 1) {
+      pages.push(
+        <button
+          key={1}
+          onClick={() => handlePageChange(1)}
+          className={`px-3 py-1 rounded ${1 === currentPage ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+        >
+          1
+        </button>
+      )
+      if (startPage > 2) {
+        pages.push(<span key="start-ellipsis" className="px-2">...</span>)
+      }
+    }
+
+    // Middle pages
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-1 rounded ${i === currentPage ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+        >
+          {i}
+        </button>
+      )
+    }
+
+    // Last page
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(<span key="end-ellipsis" className="px-2">...</span>)
+      }
+      pages.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageChange(totalPages)}
+          className={`px-3 py-1 rounded ${totalPages === currentPage ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+        >
+          {totalPages}
+        </button>
+      )
+    }
+
+    return (
+      <div className="flex items-center justify-center mt-8 space-x-2">
+        <button
+          onClick={() => handlePageChange(1)}
+          disabled={currentPage === 1}
+          className="p-1 rounded disabled:opacity-50 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <ChevronsLeft size={16} />
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="p-1 rounded disabled:opacity-50 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <ChevronLeft size={16} />
+        </button>
+        
+        {pages}
+
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="p-1 rounded disabled:opacity-50 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <ChevronRight size={16} />
+        </button>
+        <button
+          onClick={() => handlePageChange(totalPages)}
+          disabled={currentPage === totalPages}
+          className="p-1 rounded disabled:opacity-50 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <ChevronsRight size={16} />
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -140,6 +262,7 @@ const Berita = () => {
                   onClick={() => {
                     setActiveCategory(category.name)
                     setMobileMenuOpen(false)
+                    setCurrentPage(1)
                   }}
                   className={`flex items-center justify-center px-3 py-2 rounded-lg text-sm ${
                     activeCategory === category.name
@@ -161,7 +284,10 @@ const Berita = () => {
           {categories.map((category) => (
             <button
               key={category.name}
-              onClick={() => setActiveCategory(category.name)}
+              onClick={() => {
+                setActiveCategory(category.name)
+                setCurrentPage(1)
+              }}
               className={`flex items-center px-4 py-2 rounded-full text-sm whitespace-nowrap ${
                 activeCategory === category.name
                   ? 'bg-emerald-600 text-white'
@@ -338,90 +464,81 @@ const Berita = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <AnimatePresence>
-                {searchedBerita.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
-                  >
-                    <Link href={`/berita/${item.slug}`}>
-                      <div className="relative h-40">
-                        {item.image ? (
-                          <>
-                            <Image
-                              src={item.image}
-                              alt={item.title}
-                              fill
-                              className="object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.onerror = null;
-                                target.src = '/placeholder-image.jpg';
-                              }}
-                            />
-                            <div className="absolute top-2 left-2 z-10">
-                              <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
-                                {item.category}
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                            <ImageIcon size={32} className="text-gray-400" />
-                          </div>
-                        )}
-                      </div>
-                    </Link>
-                    <div className="p-4">
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <AnimatePresence>
+                  {paginatedBerita.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                      className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
+                    >
                       <Link href={`/berita/${item.slug}`}>
-                        <h3 className="font-bold dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400">
-                          {item.title}
-                        </h3>
-                      </Link>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
-                        {item.content.substring(0, 100)}...
-                      </p>
-                      <div className="flex items-center justify-between mt-4">
-                        <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
-                          <Clock size={12} className="mr-1" />
-                          {item.createdAt}
+                        <div className="relative h-40">
+                          {item.image ? (
+                            <>
+                              <Image
+                                src={item.image}
+                                alt={item.title}
+                                fill
+                                className="object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.onerror = null;
+                                  target.src = '/placeholder-image.jpg';
+                                }}
+                              />
+                              <div className="absolute top-2 left-2 z-10">
+                                <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
+                                  {item.category}
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+                              <ImageIcon size={32} className="text-gray-400" />
+                            </div>
+                          )}
                         </div>
-                        <div className="flex space-x-2">
-                          <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                            <Bookmark size={16} />
-                          </button>
-                          <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                            <Share2 size={16} />
-                          </button>
-                          <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
-                            <MoreHorizontal size={16} />
-                          </button>
+                      </Link>
+                      <div className="p-4">
+                        <Link href={`/berita/${item.slug}`}>
+                          <h3 className="font-bold dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400">
+                            {item.title}
+                          </h3>
+                        </Link>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
+                          {item.content.substring(0, 100)}...
+                        </p>
+                        <div className="flex items-center justify-between mt-4">
+                          <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
+                            <Clock size={12} className="mr-1" />
+                            {item.createdAt}
+                          </div>
+                          <div className="flex space-x-2">
+                            <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
+                              <Bookmark size={16} />
+                            </button>
+                            <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
+                              <Share2 size={16} />
+                            </button>
+                            <button className="p-1 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400">
+                              <MoreHorizontal size={16} />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              {renderPagination()}
+            </>
           )}
         </div>
-
-        {!loading && (
-          <div className="mt-8 flex justify-center">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-emerald-600 dark:text-emerald-400 font-medium flex items-center"
-            >
-              Muat Lebih Banyak
-              <ChevronDown size={16} className="ml-2" />
-            </motion.button>
-          </div>
-        )}
       </main>
     </div>
   )

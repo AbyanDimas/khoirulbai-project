@@ -20,7 +20,7 @@ export const ImportantAnnouncements = () => {
         );
         
         if (!response.ok) {
-          throw new Error('Failed to fetch important announcements');
+          throw new Error('Gagal memuat');
         }
 
         const data = await response.json();

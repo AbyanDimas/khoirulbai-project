@@ -63,15 +63,15 @@ const DesktopMenu = ({ pathname, dropdownOpen, toggleDropdown }: DesktopMenuProp
       />
 
       <Link 
-        href="/tausiyah" 
+        href="/berita" 
         className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-          isActive('/tausiyah') 
+          isActive('/berita') 
             ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800' 
             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
         }`}
       >
-        <Megaphone className={`h-4 w-4 mr-2 ${isActive('/tausiyah') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
-        tausiyah
+        <Newspaper className={`h-4 w-4 mr-2 ${isActive('/berita') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
+        Berita
       </Link>
 
       <LainnyaDropdown 
@@ -159,8 +159,15 @@ const LainnyaDropdown = ({ pathname, dropdownOpen, toggleDropdown }: { pathname:
       className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
         pathname.startsWith('/wakaf') || 
         pathname.startsWith('/keuangan') || 
-        pathname.startsWith('/berita') || 
-        pathname.startsWith('/galeri')
+        pathname.startsWith('/galeri') ||
+        pathname.startsWith('/profil') ||
+        pathname.startsWith('/alquran') ||
+        pathname.startsWith('/alquran/surah/[nomor]') ||
+        pathname.startsWith('/alquran/surah/[nomor]/tafsir') ||
+        pathname.startsWith('/berita/[id]') ||
+        pathname.startsWith('/donasi') ||
+        pathname.startsWith('/jadwal/kulum-pengajian') ||
+        pathname.startsWith('/kontak') 
           ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800' 
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
       }`}

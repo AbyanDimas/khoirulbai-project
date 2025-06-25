@@ -41,9 +41,9 @@ export const LocationMap = () => {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           ></iframe>
-          <div className="absolute bottom-4 left-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm">
+          <div className="absolute bottom-4 left-4 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm">
             <h3 className="font-bold dark:text-white">Masjid Khoirul Ba'i STM ADB</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm ">
               Jl. Raya Adiwerna No.Km. 5, Kaliwadas, Kec. Adiwerna, Kabupaten Tegal, Jawa Tengah 52194
             </p>
           </div>

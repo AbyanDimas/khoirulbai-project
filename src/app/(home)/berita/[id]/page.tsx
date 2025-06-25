@@ -446,7 +446,7 @@ const processedContent = newsItem.content
               size={20}
               className="mr-2 text-emerald-600 dark:text-emerald-400"
             />
-            Komentar (12)
+            Komentar (?)
           </h3>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow mb-4">
@@ -454,19 +454,21 @@ const processedContent = newsItem.content
               placeholder="Tulis komentar Anda..."
               className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
               rows={3}
+              disabled={true} // Disable textarea for now
             />
             <div className="flex justify-end mt-2">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-sm"
+                disabled={true} // Disable button for now
               >
                 Kirim Komentar
               </motion.button>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow mb-3">
+          {/* <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow mb-3">
             <div className="flex items-start">
               <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-700 mr-3"></div>
               <div>
@@ -490,7 +492,7 @@ const processedContent = newsItem.content
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </motion.div>
 
         <motion.div

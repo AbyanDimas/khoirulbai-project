@@ -4,69 +4,63 @@ import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { tausiyah } from '@/app/types';
-import { tausiyahCard } from '@/app/components/Section/tausiyahCard';
+import { Berita } from '@/app/types';
+import { BeritaCard } from '@/app/components/Section/BeritaCard';
 
-export const Latesttausiyah = () => {
-  const [tausiyah, settausiyah] = useState<tausiyah[]>([]);
+export const LatestBerita = () => {
+  const [berita, setBerita] = useState<Berita[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchLatesttausiyah = async () => {
+    const fetchLatestBerita = async () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/tausiyahs?populate=*&sort[0]=tanggal:desc&pagination[limit]=3`
+          `${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*&sort[0]=createdAt:desc&pagination[limit]=6`
         );
         
         if (!response.ok) {
-          throw new Error('Failed to fetch tausiyah');
+          throw new Error('Failed to fetch berita');
         }
 
         const data = await response.json();
 
-        const formattedtausiyah = data.data.map((item: any) => {
+        const formattedBerita = data.data.map((item: any) => {
           let imageUrl = '/placeholder.jpg';
-          if (item.attributes.gambar?.data?.attributes?.url) {
-            if (item.attributes.gambar.data.attributes.url.startsWith('http')) {
-              imageUrl = item.attributes.gambar.data.attributes.url;
+          if (item.attributes.image?.data?.attributes?.url) {
+            if (item.attributes.image.data.attributes.url.startsWith('http')) {
+              imageUrl = item.attributes.image.data.attributes.url;
             } else {
-              imageUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.attributes.gambar.data.attributes.url}`;
+              imageUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.attributes.image.data.attributes.url}`;
             }
           }
 
           return {
             id: item.id.toString(),
-            title: item.attributes.judul,
-            speaker: item.attributes.penulis,
-            date: new Date(item.attributes.tanggal).toLocaleDateString('id-ID', {
+            title: item.attributes.name,
+            content: item.attributes.content,
+            slug: item.attributes.slug,
+            date: new Date(item.attributes.createdAt).toLocaleDateString('id-ID', {
               day: 'numeric',
               month: 'short',
               year: 'numeric'
             }),
-            time: new Date(item.attributes.tanggal).toLocaleTimeString('id-ID', {
-              hour: '2-digit',
-              minute: '2-digit'
-            }),
-            duration: '15:30', // Default duration or you can add this field in Strapi
-            type: 'video', // Default type or you can add this field in Strapi
-            description: item.attributes.deskripsi || 'Tidak ada deskripsi',
-            views: '1.2K', // Default views or you can add this field in Strapi
+            category: item.attributes.category || 'Berita',
             image: imageUrl
           };
         });
 
-        settausiyah(formattedtausiyah);
+        setBerita(formattedBerita);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        console.error('Error fetching tausiyah:', err);
+        console.error('Error fetching berita:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchLatesttausiyah();
+    fetchLatestBerita();
   }, []);
 
   if (loading) {
@@ -74,8 +68,8 @@ export const Latesttausiyah = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white">tausiyah Terbaru</h2>
-            <p className="text-gray-600 dark:text-gray-400">Kumpulan nasihat dan ceramah terbaru</p>
+            <h2 className="text-2xl font-bold dark:text-white">Berita Terbaru</h2>
+            <p className="text-gray-600 dark:text-gray-400">Kumpulan berita terbaru seputar masjid</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,8 +93,8 @@ export const Latesttausiyah = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white">tausiyah Terbaru</h2>
-            <p className="text-gray-600 dark:text-gray-400">Kumpulan nasihat dan ceramah terbaru</p>
+            <h2 className="text-2xl font-bold dark:text-white">Berita Terbaru</h2>
+            <p className="text-gray-600 dark:text-gray-400">Kumpulan berita terbaru seputar masjid</p>
           </div>
         </div>
         <div className="text-center py-8 text-red-500 dark:text-red-400">
@@ -126,24 +120,24 @@ export const Latesttausiyah = () => {
         className="flex justify-between items-center mb-8"
       >
         <div>
-          <h2 className="text-2xl font-bold dark:text-white">tausiyah Terbaru</h2>
-          <p className="text-gray-600 dark:text-gray-400">Kumpulan nasihat dan ceramah terbaru</p>
+          <h2 className="text-2xl font-bold dark:text-white">Berita Terbaru</h2>
+          <p className="text-gray-600 dark:text-gray-400">Kumpulan berita terbaru seputar masjid</p>
         </div>
         <Link 
-          href="/tausiyah" 
+          href="/berita" 
           className="flex items-center text-emerald-600 dark:text-emerald-400 hover:underline"
         >
           Lihat semua <ChevronRight className="ml-1" />
         </Link>
       </motion.div>
 
-      {tausiyah.length === 0 ? (
+      {berita.length === 0 ? (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          Tidak ada tausiyah terbaru saat ini
+          Tidak ada berita terbaru saat ini
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tausiyah.map((item, index) => (
+          {berita.map((item, index) => (
             <motion.div
               key={item.id}
               initial={{ y: 20, opacity: 0 }}
@@ -151,7 +145,7 @@ export const Latesttausiyah = () => {
               transition={{ delay: 0.1 * index }}
               viewport={{ once: true }}
             >
-              <tausiyahCard tausiyah={item} index={index} />
+              <BeritaCard berita={item} index={index} />
             </motion.div>
           ))}
         </div>

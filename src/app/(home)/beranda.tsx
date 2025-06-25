@@ -26,9 +26,8 @@ import { UpcomingEvents } from "@/app/components/Section/UpcomingEvents";
 import { ImportantAnnouncements } from "@/app/components/Section/ImportantAnnouncements";
 import { MosqueStats } from "@/app/components/Section/MosqueStats";
 import { MosqueServices } from "@/app/components/Section/MosqueServices";
-import { Latesttausiyah } from "@/app/components/Section/LatestTausyiah";
+import { LatestBerita } from "@/app/components/Section/LatestBerita";
 import { Gallery } from "@/app/components/Section/Gallery";
-import { LiveStreaming } from "@/app/components/Section/LiveStreaming";
 import { LocationMap } from "@/app/components/Section/LocationMap";
 import { CtaSection } from "@/app/components/Section/CtaSection";
 import { Footer } from "@/app/components/Section/Footer";
@@ -384,7 +383,7 @@ const Beranda = () => {
       <MosqueServices services={services} />
       <HomeWorkProgram />
 
-      <Latesttausiyah />
+      <LatestBerita />
       <Gallery />
       {/* <LiveStreaming /> */}
       <LocationMap />

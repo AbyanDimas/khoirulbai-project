@@ -24,7 +24,7 @@ export const AnnouncementBar = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/pengunguman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=3`
         );
         
-        if (!response.ok) throw new Error('Failed to fetch announcements');
+        if (!response.ok) throw new Error('Gagal Memuat');
         
         const data = await response.json();
         
