@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search,
   Grid2X2,
   List,
-  Image,
+  Image as ImageIcon,
   Video,
   Album,
   ChevronLeft,
@@ -14,7 +15,9 @@ import {
   X,
   Download,
   Share2,
-  Heart
+  Heart,
+  ArrowLeft,
+  Images
 } from 'lucide-react'
 
 type GalleryItem = {
@@ -30,7 +33,7 @@ type GalleryItem = {
 
 const categories = [
   { name: 'Semua', icon: <Grid2X2 size={16} /> },
-  { name: 'Gambar', icon: <Image size={16} /> },
+  { name: 'Gambar', icon: <ImageIcon size={16} /> },
   { name: 'Video', icon: <Video size={16} /> },
   { name: 'Album', icon: <Album size={16} /> }
 ]
@@ -186,7 +189,7 @@ const GalleryPage = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-            <Image className="text-gray-400" size={40} />
+            <ImageIcon className="text-gray-400" size={40} />
           </div>
           <h3 className="text-lg font-medium dark:text-white">Error loading gallery</h3>
           <p className="text-gray-500 dark:text-gray-400 mt-1">{error}</p>
@@ -203,23 +206,31 @@ const GalleryPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="sticky top-0 z-10 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">            
-            <div className="relative w-full md:w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Cari di galeri..."
-                className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 text-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
+      {/* Header Section */}
+      <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
+        <div className="container mx-auto px-4 relative">
+          <Link 
+            href="/" 
+            className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
+          >
+            <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
+          </Link>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center">
+              <Images className="mr-3 h-8 w-8" />
+              Galeri Dokumentasi
+            </h1>
+            <p className="text-lg md:text-xl text-white/90">
+              Kumpulan foto dan video kegiatan Masjid Khoirul Ba'i STM ADB
+            </p>
+          </motion.div>
         </div>
-      </header>
+      </section>
 
       {/* Category Filters */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -273,7 +284,7 @@ const GalleryPage = () => {
         {filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-              <Image className="text-gray-400" size={40} />
+              <ImageIcon className="text-gray-400" size={40} />
             </div>
             <h3 className="text-lg font-medium dark:text-white">Tidak ada item yang ditemukan</h3>
             <p className="text-gray-500 dark:text-gray-400 mt-1">Coba gunakan kata kunci lain atau pilih kategori berbeda</p>
