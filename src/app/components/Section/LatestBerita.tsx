@@ -21,7 +21,7 @@ export const LatestBerita = () => {
         );
         
         if (!response.ok) {
-          throw new Error('Failed to fetch berita');
+          throw new Error('Gagal memuat berita terbaru');
         }
 
         const data = await response.json();
@@ -53,7 +53,7 @@ export const LatestBerita = () => {
 
         setBerita(formattedBerita);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setError(err instanceof Error ? err.message : 'Terjadi kesalahan tidak diketahui');
         console.error('Error fetching berita:', err);
       } finally {
         setLoading(false);
@@ -74,15 +74,22 @@ export const LatestBerita = () => {
             </p>
           </div>
         </div>
+        {/* AWS-style loading skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {[...Array(3)].map((_, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow animate-pulse">
-              <div className="aspect-video bg-gray-300 dark:bg-gray-700"></div>
-              <div className="p-4">
-                <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded mb-3 w-3/4"></div>
-                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded mb-2 w-full"></div>
-                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded mb-2 w-full"></div>
-                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded mt-4 w-1/2"></div>
+          {[...Array(6)].map((_, index) => (
+            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+              <div className="aspect-video bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+              <div className="p-4 space-y-3">
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 animate-pulse"></div>
+                </div>
+                <div className="flex justify-between items-center pt-2">
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3 animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse"></div>
+                </div>
               </div>
             </div>
           ))}
@@ -102,20 +109,32 @@ export const LatestBerita = () => {
             </p>
           </div>
         </div>
-        <div className="text-center py-8">
-          <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+        {/* AWS-style error component */}
+        <div className="border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 rounded-lg p-6">
+          <div className="flex flex-col items-center text-center">
+            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-800/50 sm:mx-0 sm:h-10 sm:w-10">
+              <svg className="h-6 w-6 text-red-500 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="mt-3">
+              <h3 className="text-lg leading-6 font-medium text-red-800 dark:text-red-200">
+                Gagal Memuat Berita
+              </h3>
+              <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                <p>Periksa Jaringan Anda Atau Coba Lagi Nanti</p>
+              </div>
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800"
+                >
+                  Coba Lagi
+                </button>
+              </div>
+            </div>
           </div>
-          <h3 className="text-lg md:text-xl font-medium dark:text-white mb-2">Gagal memuat berita</h3>
-          <p className="text-red-500 dark:text-red-400 text-sm md:text-base mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="mx-auto px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm md:text-base"
-          >
-            Coba Lagi
-          </button>
         </div>
       </section>
     );

@@ -20,7 +20,7 @@ export const ImportantAnnouncements = () => {
         );
         
         if (!response.ok) {
-          throw new Error('Gagal memuat');
+          throw new Error('Gagal memuat pengumuman penting');
         }
 
         const data = await response.json();
@@ -29,12 +29,12 @@ export const ImportantAnnouncements = () => {
           id: item.id.toString(),
           title: item.attributes.nama,
           content: item.attributes.deskripsi || 'Tidak ada deskripsi',
-          important: true // Since all from this endpoint are important
+          important: true
         }));
 
         setAnnouncements(formattedAnnouncements);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setError(err instanceof Error ? err.message : 'Terjadi kesalahan tidak diketahui');
         console.error('Error fetching important announcements:', err);
       } finally {
         setLoading(false);
@@ -57,8 +57,15 @@ export const ImportantAnnouncements = () => {
           <AlertCircle className="mr-2 text-amber-600 dark:text-amber-400" />
           Pengumuman Penting
         </h2>
-        <div className="flex justify-center items-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amber-500"></div>
+        {/* AWS-style loading skeleton */}
+        <div className="space-y-4">
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className="animate-pulse">
+              <div className="h-5 bg-amber-100 dark:bg-amber-800/50 rounded w-3/4 mb-3"></div>
+              <div className="h-3 bg-amber-100 dark:bg-amber-800/50 rounded w-full mb-1"></div>
+              <div className="h-3 bg-amber-100 dark:bg-amber-800/50 rounded w-5/6"></div>
+            </div>
+          ))}
         </div>
       </motion.div>
     );
@@ -77,15 +84,31 @@ export const ImportantAnnouncements = () => {
           <AlertCircle className="mr-2 text-amber-600 dark:text-amber-400" />
           Pengumuman Penting
         </h2>
-        <div className="text-center text-red-500 dark:text-red-400 py-4">
-          {error}
+        {/* AWS-style error component */}
+        <div className="border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Gagal Memuat Pengumuman</h3>
+              <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                <p>Periksa Jaringan Anda Atau Coba Lagi Nanti</p>
+              </div>
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:text-red-200 dark:bg-red-800/50 dark:hover:bg-red-800"
+                >
+                  Coba Lagi
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <button 
-          onClick={() => window.location.reload()}
-          className="w-full py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-        >
-          Coba Lagi
-        </button>
       </motion.div>
     );
   }

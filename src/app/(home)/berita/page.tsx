@@ -65,10 +65,52 @@ const categories = [
 
 const ITEMS_PER_PAGE = 21;
 
+const GoogleLikeLoading = () => {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
+      <div className="relative w-20 h-20 mb-6">
+        <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30 animate-ping"></div>
+        <div className="absolute inset-2 rounded-full bg-emerald-200 dark:bg-emerald-800/50 animate-pulse"></div>
+        <Newspaper className="absolute inset-4 w-12 h-12 text-emerald-600 dark:text-emerald-400 animate-bounce" />
+      </div>
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+        <div className="bg-emerald-600 h-2.5 rounded-full animate-progress" style={{ width: '70%' }}></div>
+      </div>
+      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Memuat Berita</h3>
+      <p className="text-gray-500 dark:text-gray-400 text-sm">Sedang mengambil informasi terbaru...</p>
+    </div>
+  );
+};
+
+const GoogleLikeError = ({ error, onRetry }: { error: string, onRetry: () => void }) => {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
+      <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
+        <div className="relative">
+          <X className="w-12 h-12 text-red-600 dark:text-red-400" />
+          <div className="absolute inset-0 rounded-full bg-red-200 dark:bg-red-800/30 animate-ping opacity-75"></div>
+        </div>
+      </div>
+      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Gagal Memuat Berita</h3>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">{error}</p>
+      <button
+        onClick={onRetry}
+        className="px-6 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors flex items-center shadow-sm"
+      >
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Coba Lagi
+      </button>
+    </div>
+  );
+};
+
 const Berita = () => {
   const [activeCategory, setActiveCategory] = useState('Semua')
   const [berita, setBerita] = useState<BeritaItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -81,6 +123,9 @@ const Berita = () => {
       setLoading(true)
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*`)
+        if (!response.ok) {
+          throw new Error('Gagal memuat berita. Silakan coba lagi nanti.')
+        }
         const data = await response.json()
         
         const formattedBerita = data.data.map((item: any) => {
@@ -110,6 +155,7 @@ const Berita = () => {
         setTotalPages(Math.ceil(formattedBerita.length / ITEMS_PER_PAGE))
       } catch (error) {
         console.error('Error fetching news:', error)
+        setError(error instanceof Error ? error.message : 'Terjadi kesalahan tidak diketahui')
       } finally {
         setLoading(false)
       }
@@ -256,6 +302,74 @@ const Berita = () => {
     )
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
+          <div className="container mx-auto px-4 relative">
+            <Link 
+              href="/" 
+              className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
+            >
+              <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
+            </Link>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center">
+                <BookText className="mr-3 h-8 w-8" />
+                Berita & Artikel
+              </h1>
+              <p className="text-lg md:text-xl text-white/90">
+                Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB
+              </p>
+            </motion.div>
+          </div>
+        </section>
+        <section className="container mx-auto px-4 py-12">
+          <GoogleLikeError error={error} onRetry={() => window.location.reload()} />
+        </section>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
+          <div className="container mx-auto px-4 relative">
+            <Link 
+              href="/" 
+              className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
+            >
+              <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
+            </Link>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center">
+                <BookText className="mr-3 h-8 w-8" />
+                Berita & Artikel
+              </h1>
+              <p className="text-lg md:text-xl text-white/90">
+                Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB
+              </p>
+            </motion.div>
+          </div>
+        </section>
+        <section className="container mx-auto px-4 py-12">
+          <GoogleLikeLoading />
+        </section>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header Section */}
@@ -283,7 +397,6 @@ const Berita = () => {
           </motion.div>
         </div>
       </section>
-
 
       <AnimatePresence>
         {mobileMenuOpen && (

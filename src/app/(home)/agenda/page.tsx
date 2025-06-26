@@ -46,6 +46,47 @@ const categoryBackgrounds = {
   ramadhan: "bg-emerald-100 dark:bg-emerald-900"
 };
 
+const GoogleLikeLoading = () => {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
+      <div className="relative w-20 h-20 mb-6">
+        <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30 animate-ping"></div>
+        <div className="absolute inset-2 rounded-full bg-emerald-200 dark:bg-emerald-800/50 animate-pulse"></div>
+        <CalendarDays className="absolute inset-4 w-12 h-12 text-emerald-600 dark:text-emerald-400 animate-bounce" />
+      </div>
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+        <div className="bg-emerald-600 h-2.5 rounded-full animate-progress" style={{ width: '70%' }}></div>
+      </div>
+      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Memuat Agenda</h3>
+      <p className="text-gray-500 dark:text-gray-400 text-sm">Sedang mengambil data kegiatan...</p>
+    </div>
+  );
+};
+
+const GoogleLikeError = ({ error, onRetry }: { error: string, onRetry: () => void }) => {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
+      <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
+        <div className="relative">
+          <X className="w-12 h-12 text-red-600 dark:text-red-400" />
+          <div className="absolute inset-0 rounded-full bg-red-200 dark:bg-red-800/30 animate-ping opacity-75"></div>
+        </div>
+      </div>
+      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Gagal Memuat Agenda</h3>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">{error}</p>
+      <button
+        onClick={onRetry}
+        className="px-6 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors flex items-center shadow-sm"
+      >
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Coba Lagi
+      </button>
+    </div>
+  );
+};
+
 export default function Agenda() {
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -181,9 +222,7 @@ export default function Agenda() {
   if (loading) {
     return (
       <section className="container mx-auto px-4 py-12">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
-        </div>
+        <GoogleLikeLoading />
       </section>
     );
   }
@@ -191,19 +230,7 @@ export default function Agenda() {
   if (error) {
     return (
       <section className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-            <CalendarDays className="text-gray-400" size={40} />
-          </div>
-          <h3 className="text-lg font-medium dark:text-white">Error loading agenda</h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
+        <GoogleLikeError error={error} onRetry={() => window.location.reload()} />
       </section>
     );
   }
@@ -269,7 +296,7 @@ export default function Agenda() {
         </motion.div>
 
         {agendaItems.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto p-8">
             <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
               <CalendarDays className="text-gray-400" size={40} />
             </div>
