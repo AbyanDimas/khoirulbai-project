@@ -23,7 +23,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Copy,
-  Check
+  Check,
+  ArrowLeft,
+  BookText
 } from 'lucide-react'
 import Image from 'next/image'
 import {
@@ -256,22 +258,32 @@ const Berita = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="sticky top-0 z-10 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">            
-            <div className="relative w-full md:w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Cari di Berita..."
-                className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 text-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
+      {/* Header Section */}
+      <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
+        <div className="container mx-auto px-4 relative">
+          <Link 
+            href="/" 
+            className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
+          >
+            <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
+          </Link>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center">
+              <BookText className="mr-3 h-8 w-8" />
+              Berita & Artikel
+            </h1>
+            <p className="text-lg md:text-xl text-white/90">
+              Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB
+            </p>
+          </motion.div>
         </div>
-      </header>
+      </section>
+
 
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -384,17 +396,17 @@ const Berita = () => {
                       >
                         Baca selengkapnya
                       </Link>
-<div className="flex justify-end mt-2">
-  <div className="relative">
-    <button
-      className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-      onClick={() => toggleShareMenu(item.id)}
-    >
-      <Share2 size={15} />
-      <span className="text-sm font-medium">Bagikan</span>
-    </button>
-  </div>
-</div>
+                      <div className="flex justify-end mt-2">
+                        <div className="relative">
+                          <button
+                            className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+                            onClick={() => toggleShareMenu(item.id)}
+                          >
+                            <Share2 size={15} />
+                            <span className="text-sm font-medium">Bagikan</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -460,17 +472,17 @@ const Berita = () => {
                       <Clock size={12} className="mr-1" />
                       {item.createdAt}
                     </div>
-<div className="flex justify-end mt-2">
-  <div className="relative">
-    <button
-      className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-      onClick={() => toggleShareMenu(item.id)}
-    >
-      <Share2 size={15} />
-      <span className="text-sm font-medium">Bagikan</span>
-    </button>
-  </div>
-</div>
+                    <div className="flex justify-end mt-2">
+                      <div className="relative">
+                        <button
+                          className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+                          onClick={() => toggleShareMenu(item.id)}
+                        >
+                          <Share2 size={15} />
+                          <span className="text-sm font-medium">Bagikan</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -558,17 +570,17 @@ const Berita = () => {
                             <Clock size={12} className="mr-1" />
                             {item.createdAt}
                           </div>
-<div className="flex justify-end mt-2">
-  <div className="relative">
-    <button
-      className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-      onClick={() => toggleShareMenu(item.id)}
-    >
-      <Share2 size={15} />
-      <span className="text-sm font-medium">Bagikan</span>
-    </button>
-  </div>
-</div>
+                          <div className="flex justify-end mt-2">
+                            <div className="relative">
+                              <button
+                                className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+                                onClick={() => toggleShareMenu(item.id)}
+                              >
+                                <Share2 size={15} />
+                                <span className="text-sm font-medium">Bagikan</span>
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
