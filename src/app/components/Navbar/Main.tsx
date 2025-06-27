@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
 import { UserButton, useUser } from '@clerk/nextjs'
@@ -16,6 +16,7 @@ import { X, Search } from 'lucide-react'
 
 const Navbar = () => {
   const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState({
     jadwal: false,
@@ -40,7 +41,9 @@ const Navbar = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Searching for:', searchQuery)
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+    }
     setSearchQuery('')
     setSearchOpen(false)
   }
@@ -73,7 +76,7 @@ const Navbar = () => {
             <UserSection isSignedIn={isSignedIn ?? false} user={user} />
           </div>
 
-          <div className="flex items-center md:hidden ">
+          <div className="flex items-center md:hidden">
             <button
               onClick={() => setSearchOpen(!searchOpen)}
               className="p-2 rounded-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
@@ -103,15 +106,15 @@ const Navbar = () => {
             </button>
           </div>
         </div>
-
-        <MobileSearch 
-          searchOpen={searchOpen}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          handleSearch={handleSearch}
-          setSearchOpen={setSearchOpen}
-        />
       </div>
+
+      <MobileSearch 
+        searchOpen={searchOpen}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        handleSearch={handleSearch}
+        setSearchOpen={setSearchOpen}
+      />
 
       <MobileMenu 
         isOpen={isOpen}
