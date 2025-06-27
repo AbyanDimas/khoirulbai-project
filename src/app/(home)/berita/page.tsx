@@ -25,9 +25,11 @@ import {
   Copy,
   Check,
   ArrowLeft,
-  BookText
+  BookText,
+  X
 } from 'lucide-react'
 import Image from 'next/image'
+import Head from 'next/head'
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -106,6 +108,18 @@ const GoogleLikeError = ({ error, onRetry }: { error: string, onRetry: () => voi
   );
 };
 
+const EmptyState = ({ title, description }: { title: string, description: string }) => {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-sm">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
+        <Newspaper className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">{title}</h3>
+      <p className="text-gray-500 dark:text-gray-400">{description}</p>
+    </div>
+  );
+};
+
 const Berita = () => {
   const [activeCategory, setActiveCategory] = useState('Semua')
   const [berita, setBerita] = useState<BeritaItem[]>([])
@@ -143,11 +157,15 @@ const Berita = () => {
             title: item.attributes.name,
             content: item.attributes.content,
             category: item.attributes.category || 'Berita',
-            createdAt: new Date(item.attributes.createdAt).toLocaleDateString('id-ID'),
+            createdAt: new Date(item.attributes.createdAt).toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            }),
             slug: item.attributes.slug,
             image: imageUrl,
-            isTrending: Math.random() > 0.7,
-            isFeatured: Math.random() > 0.8
+            isTrending: item.attributes.isTrending || Math.random() > 0.7,
+            isFeatured: item.attributes.isFeatured || Math.random() > 0.8
           }
         })
         
@@ -182,6 +200,9 @@ const Berita = () => {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   )
+
+  const featuredBerita = berita.filter(item => item.isFeatured)
+  const trendingBerita = berita.filter(item => item.isTrending)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -305,6 +326,16 @@ const Berita = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Head>
+          <title>Berita & Artikel - Masjid Khoirul Ba'i STM ADB</title>
+          <meta name="description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+          <meta name="keywords" content="berita masjid, artikel islami, kegiatan masjid, STM ADB" />
+          <meta property="og:title" content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB" />
+          <meta property="og:description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+        </Head>
+        
         <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
           <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
           <div className="container mx-auto px-4 relative">
@@ -339,6 +370,16 @@ const Berita = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Head>
+          <title>Berita & Artikel - Masjid Khoirul Ba'i STM ADB</title>
+          <meta name="description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+          <meta name="keywords" content="berita masjid, artikel islami, kegiatan masjid, STM ADB" />
+          <meta property="og:title" content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB" />
+          <meta property="og:description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+        </Head>
+        
         <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
           <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
           <div className="container mx-auto px-4 relative">
@@ -372,6 +413,16 @@ const Berita = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Head>
+        <title>Berita & Artikel - Masjid Khoirul Ba'i STM ADB</title>
+        <meta name="description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+        <meta name="keywords" content="berita masjid, artikel islami, kegiatan masjid, STM ADB" />
+        <meta property="og:title" content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB" />
+        <meta property="og:description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+      </Head>
+
       {/* Header Section */}
       <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
@@ -455,60 +506,144 @@ const Berita = () => {
         {activeCategory === 'Semua' && (
           <div className="hidden md:block mb-8">
             <h2 className="text-xl font-bold mb-4 dark:text-white">Sorotan Utama</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {berita.filter(item => item.isFeatured).map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
-                >
-                  <Link href={`/berita/${item.slug}`}>
-                    <div className="relative h-48">
-                      {item.image ? (
-                        <>
-                          <Image
-                            src={item.image}
-                            alt={item.title}
-                            fill
-                            className="object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.onerror = null;
-                              target.src = '/placeholder-image.jpg';
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 z-10" />
-                        </>
-                      ) : (
-                        <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                          <ImageIcon size={32} className="text-gray-400" />
+            {featuredBerita.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {featuredBerita.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <Link href={`/berita/${item.slug}`}>
+                      <div className="relative h-48">
+                        {item.image ? (
+                          <>
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              className="object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = '/placeholder-image.jpg';
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 z-10" />
+                          </>
+                        ) : (
+                          <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+                            <ImageIcon size={32} className="text-gray-400" />
+                          </div>
+                        )}
+                        <div className="absolute bottom-4 left-4 z-20">
+                          <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
+                            {item.category}
+                          </span>
+                          <h3 className="text-white text-xl font-bold mt-2">{item.title}</h3>
+                          <div className="flex items-center text-white/80 text-sm mt-1">
+                            <Clock size={14} className="mr-1" />
+                            {item.createdAt}
+                          </div>
                         </div>
-                      )}
-                      <div className="absolute bottom-4 left-4 z-20">
-                        <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
-                          {item.category}
-                        </span>
-                        <h3 className="text-white text-xl font-bold mt-2">{item.title}</h3>
-                        <div className="flex items-center text-white/80 text-sm mt-1">
-                          <Clock size={14} className="mr-1" />
-                          {item.createdAt}
+                      </div>
+                    </Link>
+                    <div className="p-4">
+                      <p className="text-gray-700 dark:text-gray-300 line-clamp-3">
+                        {item.content.substring(0, 150)}...
+                      </p>
+                      <div className="flex justify-between items-center mt-4">
+                        <Link 
+                          href={`/berita/${item.slug}`}
+                          className="text-emerald-600 dark:text-emerald-400 hover:underline text-sm font-medium"
+                        >
+                          Baca selengkapnya
+                        </Link>
+                        <div className="flex justify-end mt-2">
+                          <div className="relative">
+                            <button
+                              className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+                              onClick={() => toggleShareMenu(item.id)}
+                            >
+                              <Share2 size={15} />
+                              <span className="text-sm font-medium">Bagikan</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </Link>
-                  <div className="p-4">
-                    <p className="text-gray-700 dark:text-gray-300 line-clamp-3">
-                      {item.content.substring(0, 150)}...
-                    </p>
-                    <div className="flex justify-between items-center mt-4">
-                      <Link 
-                        href={`/berita/${item.slug}`}
-                        className="text-emerald-600 dark:text-emerald-400 hover:underline text-sm font-medium"
-                      >
-                        Baca selengkapnya
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState 
+                title="Tidak Ada Sorotan Utama" 
+                description="Belum ada berita yang ditandai sebagai sorotan utama saat ini." 
+              />
+            )}
+          </div>
+        )}
+
+        {(activeCategory === 'Semua' || activeCategory === 'Trending') && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4 dark:text-white flex items-center">
+              <TrendingUp size={20} className="mr-2 text-emerald-600 dark:text-emerald-400" />
+              {activeCategory === 'Semua' ? 'Trending Sekarang' : 'Berita Trending'}
+            </h2>
+            {trendingBerita.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {trendingBerita.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
+                  >
+                    <Link href={`/berita/${item.slug}`}>
+                      <div className="relative h-40">
+                        {item.image ? (
+                          <>
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              className="object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = '/placeholder-image.jpg';
+                              }}
+                            />
+                            <div className="absolute top-2 right-2 z-10">
+                              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
+                                <TrendingUp size={12} className="mr-1" />
+                                Trending
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+                            <ImageIcon size={32} className="text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                    <div className="p-4">
+                      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                        {item.category}
+                      </span>
+                      <Link href={`/berita/${item.slug}`}>
+                        <h3 className="font-bold mt-1 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400">
+                          {item.title}
+                        </h3>
                       </Link>
+                      <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs mt-2">
+                        <Clock size={12} className="mr-1" />
+                        {item.createdAt}
+                      </div>
                       <div className="flex justify-end mt-2">
                         <div className="relative">
                           <button
@@ -521,85 +656,15 @@ const Berita = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {(activeCategory === 'Semua' || activeCategory === 'Trending') && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4 dark:text-white flex items-center">
-              <TrendingUp size={20} className="mr-2 text-emerald-600 dark:text-emerald-400" />
-              {activeCategory === 'Semua' ? 'Trending Sekarang' : 'Berita Trending'}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {berita.filter(item => item.isTrending).map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
-                >
-                  <Link href={`/berita/${item.slug}`}>
-                    <div className="relative h-40">
-                      {item.image ? (
-                        <>
-                          <Image
-                            src={item.image}
-                            alt={item.title}
-                            fill
-                            className="object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.onerror = null;
-                              target.src = '/placeholder-image.jpg';
-                            }}
-                          />
-                          <div className="absolute top-2 right-2 z-10">
-                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
-                              <TrendingUp size={12} className="mr-1" />
-                              Trending
-                            </span>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                          <ImageIcon size={32} className="text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                  <div className="p-4">
-                    <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                      {item.category}
-                    </span>
-                    <Link href={`/berita/${item.slug}`}>
-                      <h3 className="font-bold mt-1 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400">
-                        {item.title}
-                      </h3>
-                    </Link>
-                    <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs mt-2">
-                      <Clock size={12} className="mr-1" />
-                      {item.createdAt}
-                    </div>
-                    <div className="flex justify-end mt-2">
-                      <div className="relative">
-                        <button
-                          className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-                          onClick={() => toggleShareMenu(item.id)}
-                        >
-                          <Share2 size={15} />
-                          <span className="text-sm font-medium">Bagikan</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState 
+                title="Tidak Ada Berita Trending" 
+                description="Belum ada berita yang sedang trending saat ini." 
+              />
+            )}
           </div>
         )}
 
@@ -631,77 +696,86 @@ const Berita = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <AnimatePresence>
-                  {paginatedBerita.map((item, index) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
-                    >
-                      <Link href={`/berita/${item.slug}`}>
-                        <div className="relative h-40">
-                          {item.image ? (
-                            <>
-                              <Image
-                                src={item.image}
-                                alt={item.title}
-                                fill
-                                className="object-cover"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.onerror = null;
-                                  target.src = '/placeholder-image.jpg';
-                                }}
-                              />
-                              <div className="absolute top-2 left-2 z-10">
-                                <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
-                                  {item.category}
-                                </span>
+              {paginatedBerita.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <AnimatePresence>
+                      {paginatedBerita.map((item, index) => (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                          className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
+                        >
+                          <Link href={`/berita/${item.slug}`}>
+                            <div className="relative h-40">
+                              {item.image ? (
+                                <>
+                                  <Image
+                                    src={item.image}
+                                    alt={item.title}
+                                    fill
+                                    className="object-cover"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.onerror = null;
+                                      target.src = '/placeholder-image.jpg';
+                                    }}
+                                  />
+                                  <div className="absolute top-2 left-2 z-10">
+                                    <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
+                                      {item.category}
+                                    </span>
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+                                  <ImageIcon size={32} className="text-gray-400" />
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                          <div className="p-4">
+                            <Link href={`/berita/${item.slug}`}>
+                              <h3 className="font-bold dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400">
+                                {item.title}
+                              </h3>
+                            </Link>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
+                              {item.content.substring(0, 100)}...
+                            </p>
+                            <div className="flex items-center justify-between mt-4">
+                              <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
+                                <Clock size={12} className="mr-1" />
+                                {item.createdAt}
                               </div>
-                            </>
-                          ) : (
-                            <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                              <ImageIcon size={32} className="text-gray-400" />
-                            </div>
-                          )}
-                        </div>
-                      </Link>
-                      <div className="p-4">
-                        <Link href={`/berita/${item.slug}`}>
-                          <h3 className="font-bold dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400">
-                            {item.title}
-                          </h3>
-                        </Link>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
-                          {item.content.substring(0, 100)}...
-                        </p>
-                        <div className="flex items-center justify-between mt-4">
-                          <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
-                            <Clock size={12} className="mr-1" />
-                            {item.createdAt}
-                          </div>
-                          <div className="flex justify-end mt-2">
-                            <div className="relative">
-                              <button
-                                className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-                                onClick={() => toggleShareMenu(item.id)}
-                              >
-                                <Share2 size={15} />
-                                <span className="text-sm font-medium">Bagikan</span>
-                              </button>
+                              <div className="flex justify-end mt-2">
+                                <div className="relative">
+                                  <button
+                                    className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
+                                    onClick={() => toggleShareMenu(item.id)}
+                                  >
+                                    <Share2 size={15} />
+                                    <span className="text-sm font-medium">Bagikan</span>
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
 
-              {renderPagination()}
+                  {renderPagination()}
+                </>
+              ) : (
+                <EmptyState 
+                  title={`Tidak Ada Berita ${activeCategory === 'Semua' ? '' : activeCategory}`} 
+                  description={`Maaf, belum ada berita yang tersedia dalam kategori ${activeCategory === 'Semua' ? 'ini' : activeCategory} saat ini.`} 
+                />
+              )}
             </>
           )}
         </div>
