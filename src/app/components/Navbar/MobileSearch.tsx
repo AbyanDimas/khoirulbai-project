@@ -1,5 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, X, CalendarDays, Clock4, Newspaper, BookOpenText, Mic2, FileText, Images, Clock, Megaphone, Home } from 'lucide-react'
+import { Search, X, CalendarDays, Clock4, Newspaper, BookOpenText, Mic2, FileText, Images, Clock, Megaphone, Home,   Book,
+  Mail,
+  AlertCircle,
+  Users,
+  HeartHandshake,
+  ScrollText,
+  BookOpen,
+  DollarSign,
+  Info,
+  Image
+ } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { distance } from 'fastest-levenshtein'
@@ -11,17 +21,27 @@ interface Suggestion {
 }
 
 const allSuggestions: Suggestion[] = [
+  { name: 'Beranda', icon: Home, href: '/' },
   { name: 'Agenda Masjid', icon: CalendarDays, href: '/agenda' },
-  { name: 'Jadwal Sholat', icon: Clock4, href: '/jadwal-sholat' },
+  { name: 'Al-Quran Digital', icon: Book, href: '/alquran' },
   { name: 'Berita Terbaru', icon: Newspaper, href: '/berita' },
-  { name: 'Jadwal Jumat', icon: BookOpenText, href: '/jadwal-jumat' },
-  { name: 'Pengajian', icon: Mic2, href: '/jadwal-pengajian' },
-  { name: 'Laporan Keuangan', icon: FileText, href: '/keuangan' },
   { name: 'Galeri Foto', icon: Images, href: '/galeri' },
-  { name: 'Tausiyah', icon: Megaphone, href: '/tausiyah' },
-  { name: 'Jadwal Harian', icon: Clock, href: '/jadwal-harian' },
-  { name: 'Beranda', icon: Home, href: '/' }
-]
+  { name: 'Jadwal Sholat Harian', icon: Clock4, href: '/jadwal-sholat' },
+  { name: 'Jadwal Sholat Jumat', icon: BookOpenText, href: '/jadwal/jumat' },
+  { name: 'Kultum & Pengajian', icon: Mic2, href: '/jadwal/kultum-pengajian' },
+  { name: 'Laporan Keuangan', icon: FileText, href: '/laporan/keuangan' },
+  { name: 'Laporan Wakaf', icon: DollarSign, href: '/laporan/waqaf' },
+  { name: 'Pengumuman', icon: AlertCircle, href: '/pengumuman' },
+  { name: 'Profil Masjid', icon: Users, href: '/profil' },
+  { name: 'Program Kerja', icon: FileText, href: '/program-kerja' },
+  { name: 'Tausiyah Islami', icon: Megaphone, href: '/tausiyah' },
+  { name: 'Tentang Kami', icon: Info, href: '/tentang-kami' },
+  { name: 'Zakat & Infaq', icon: HeartHandshake, href: '/zakat-infaq' },
+  { name: 'Kontak Pengurus', icon: Mail, href: '/kontak' },
+  { name: 'Donasi Masjid', icon: HeartHandshake, href: '/donasi' },
+  { name: 'Masuk Akun', icon: ScrollText, href: '/sign-in' },
+  { name: 'Daftar Akun', icon: ScrollText, href: '/sign-up' }
+];
 
 interface MobileSearchProps {
   searchOpen: boolean
