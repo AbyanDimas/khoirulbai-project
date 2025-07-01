@@ -15,7 +15,8 @@ import {
   Newspaper,
   Images,
   Clock10,
-  HandHeart
+  HandHeart,
+  Book
 } from 'lucide-react'
 
 interface DesktopMenuProps {
@@ -233,21 +234,21 @@ const LainnyaDropdown = ({ pathname, dropdownOpen, toggleDropdown }: { pathname:
               Keuangan
             </Link>
             <Link
-              href="/berita"
+              href="/alquran"
               className={`flex flex-col items-center p-3 rounded-lg text-sm transition-colors duration-150 ${
-                pathname === '/berita' 
+                pathname === '/alquran' 
                   ? 'bg-emerald-50 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400' 
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <div className={`flex items-center justify-center h-10 w-10 rounded-lg mb-2 ${
-                pathname === '/berita' 
+                pathname === '/alquran' 
                   ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300' 
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
               }`}>
-                <Newspaper className="h-5 w-5" />
+                <Book className="h-5 w-5" />
               </div>
-              Berita
+              alquran
             </Link>
             <Link
               href="/galeri"

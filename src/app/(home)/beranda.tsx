@@ -52,82 +52,82 @@ const Beranda = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isPlaying, setIsPlaying] = useState(false);
   const [jadwalSholat, setJadwalSholat] = useState<PrayerSchedule>({
-    today: [
-      {
-        name: "Subuh",
-        time: "04:30",
-        passed: false,
-        icon: <Sunrise className="h-5 w-5" />,
-      },
-      {
-        name: "Syuruq",
-        time: "05:45",
-        passed: false,
-        icon: <Sun className="h-5 w-5" />,
-      },
-      {
-        name: "Dzuhur",
-        time: "12:15",
-        passed: false,
-        icon: <Sun className="h-5 w-5" />,
-      },
-      {
-        name: "Ashar",
-        time: "15:30",
-        passed: false,
-        icon: <CloudSun className="h-5 w-5" />,
-      },
-      {
-        name: "Maghrib",
-        time: "18:00",
-        passed: false,
-        icon: <Sunset className="h-5 w-5" />,
-      },
-      {
-        name: "Isya",
-        time: "19:30",
-        passed: false,
-        icon: <Moon className="h-5 w-5" />,
-      },
-    ],
-    tomorrow: [
-      {
-        name: "Subuh",
-        time: "04:29",
-        passed: false,
-        icon: <Sunrise className="h-5 w-5" />,
-      },
-      {
-        name: "Syuruq",
-        time: "05:44",
-        passed: false,
-        icon: <Sun className="h-5 w-5" />,
-      },
-      {
-        name: "Dzuhur",
-        time: "12:14",
-        passed: false,
-        icon: <Sun className="h-5 w-5" />,
-      },
-      {
-        name: "Ashar",
-        time: "15:29",
-        passed: false,
-        icon: <CloudSun className="h-5 w-5" />,
-      },
-      {
-        name: "Maghrib",
-        time: "17:59",
-        passed: false,
-        icon: <Sunset className="h-5 w-5" />,
-      },
-      {
-        name: "Isya",
-        time: "19:29",
-        passed: false,
-        icon: <Moon className="h-5 w-5" />,
-      },
-    ],
+today: [
+  {
+    name: "Subuh",
+    time: "04:32",
+    passed: false,
+    icon: <Sunrise className="h-5 w-5" />,
+  },
+  {
+    name: "Syuruq",
+    time: "05:56",
+    passed: false,
+    icon: <Sun className="h-5 w-5" />,
+  },
+  {
+    name: "Dzuhur",
+    time: "11:47",
+    passed: false,
+    icon: <Sun className="h-5 w-5" />,
+  },
+  {
+    name: "Ashar",
+    time: "15:09",
+    passed: false,
+    icon: <CloudSun className="h-5 w-5" />,
+  },
+  {
+    name: "Maghrib",
+    time: "17:39",
+    passed: false,
+    icon: <Sunset className="h-5 w-5" />,
+  },
+  {
+    name: "Isya",
+    time: "18:54",
+    passed: false,
+    icon: <Moon className="h-5 w-5" />,
+  },
+],
+tomorrow: [
+  {
+    name: "Subuh",
+    time: "04:32",
+    passed: false,
+    icon: <Sunrise className="h-5 w-5" />,
+  },
+  {
+    name: "Syuruq",
+    time: "05:56",
+    passed: false,
+    icon: <Sun className="h-5 w-5" />,
+  },
+  {
+    name: "Dzuhur",
+    time: "11:47",
+    passed: false,
+    icon: <Sun className="h-5 w-5" />,
+  },
+  {
+    name: "Ashar",
+    time: "15:09",
+    passed: false,
+    icon: <CloudSun className="h-5 w-5" />,
+  },
+  {
+    name: "Maghrib",
+    time: "17:39",
+    passed: false,
+    icon: <Sunset className="h-5 w-5" />,
+  },
+  {
+    name: "Isya",
+    time: "18:54",
+    passed: false,
+    icon: <Moon className="h-5 w-5" />,
+  },
+],
   });
 
   // Update current time every second
@@ -151,7 +151,7 @@ const Beranda = () => {
     day: "15",
     month: "Dhul-Qadah",
     year: "1445",
-    hijri: "15 Dhul-Qadah 1445 H",
+    hijri: "6 Muharram 1447 H",
   };
 
   // Weather data (mock data)
