@@ -47,26 +47,37 @@ const MobileMenu = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.2 }}
-          className="md:hidden overflow-hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
-        >
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              href="/"
-              className={`flex items-center px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${
-                isActive('/') 
-                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800' 
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-              onClick={() => setIsOpen(false)}
-            >
-              <Home className={`h-5 w-5 mr-3 ${isActive('/') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
-              Beranda
-            </Link>
+        <>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Menu Content */}
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed inset-x-4 top-20 z-50 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden"
+          >
+            <div className="px-2 pt-4 pb-4 space-y-1">
+              <Link
+                href="/"
+                className={`flex items-center px-4 py-3 rounded-lg text-base font-medium transition-colors duration-200 ${
+                  isActive('/') 
+                    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-gray-700' 
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-700'
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                <Home className={`h-5 w-5 mr-3 ${isActive('/') ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                Beranda
+              </Link>
 
             <Link
               href="/agenda"
@@ -247,46 +258,47 @@ const MobileMenu = ({
                 </motion.div>
               )}
             </AnimatePresence>
-
-            <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
-              {isSignedIn ? (
-                <div className="flex items-center px-3 py-3">
-                  <UserButton 
-                    afterSignOutUrl="/" 
-                    appearance={{
-                      elements: {
-                        userButtonAvatarBox: "h-8 w-8",
-                        userButtonPopoverCard: "dark:bg-gray-800 dark:border-gray-700"
-                      }
-                    }} 
-                  />
-                  <span className="ml-3 text-base font-medium text-gray-700 dark:text-gray-300">
-                    {user?.firstName || 'Profile'}
-                  </span>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2 px-3">
-                  <Link
-                    href="/sign-in"
-                    className="flex items-center justify-center px-4 py-2 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <LogIn className="h-5 w-5 mr-2" />
-                    Login
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    className="flex items-center justify-center px-4 py-2 rounded-lg text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-200"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <UserPlus className="h-5 w-5 mr-2" />
-                    Daftar
-                  </Link>
-                </div>
-              )}
+            
+              <div className="pt-2 border-t border-gray-200/50 dark:border-gray-700/50">
+                {isSignedIn ? (
+                  <div className="flex items-center px-4 py-3">
+                    <UserButton 
+                      afterSignOutUrl="/" 
+                      appearance={{
+                        elements: {
+                          userButtonAvatarBox: "h-8 w-8",
+                          userButtonPopoverCard: "dark:bg-gray-800 dark:border-gray-700"
+                        }
+                      }} 
+                    />
+                    <span className="ml-3 text-base font-medium text-gray-700 dark:text-gray-300">
+                      {user?.firstName || 'Profile'}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 px-3">
+                    <Link
+                      href="/sign-in"
+                      className="flex items-center justify-center px-4 py-2 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-700 transition-colors duration-200"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <LogIn className="h-5 w-5 mr-2" />
+                      Login
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="flex items-center justify-center px-4 py-2 rounded-lg text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-200"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <UserPlus className="h-5 w-5 mr-2" />
+                      Daftar
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   )
