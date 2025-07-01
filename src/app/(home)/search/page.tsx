@@ -1,22 +1,37 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
 const availablePages = [
+  { path: '/', name: 'Beranda', description: 'Halaman utama' },
   { path: '/agenda', name: 'Agenda', description: 'Jadwal kegiatan masjid' },
-  { path: '/berita/:id', name: 'Berita Detail', description: 'Detail berita masjid' },
+  { path: '/alquran', name: 'Al-Quran', description: 'Baca Al-Quran digital' },
+  { path: '/alquran/surah/[nomor]', name: 'Surah Al-Quran', description: 'Baca surah Al-Quran' },
+  { path: '/alquran/surah/[nomor]/tafsir', name: 'Tafsir Surah', description: 'Tafsir ayat Al-Quran' },
+  { path: '/berita', name: 'Berita', description: 'Berita dan pengumuman masjid' },
+  { path: '/berita/[id]', name: 'Detail Berita', description: 'Detail berita masjid' },
   { path: '/berita/galeri', name: 'Galeri Berita', description: 'Galeri foto kegiatan' },
+  { path: '/donasi', name: 'Donasi', description: 'Donasi dan infaq masjid' },
+  { path: '/galeri', name: 'Galeri', description: 'Galeri foto kegiatan masjid' },
+  { path: '/jadwal-sholat', name: 'Jadwal Sholat', description: 'Jadwal sholat harian' },
   { path: '/jadwal/jumat', name: 'Jadwal Sholat Jumat', description: 'Jadwal khutbah dan imam' },
   { path: '/jadwal/kultum-pengajian', name: 'Jadwal Kultum & Pengajian', description: 'Jadwal kajian rutin' },
-  { path: '/jadwal/jadwal-shalat', name: 'Jadwal Sholat', description: 'Jadwal Sholat' },
+  { path: '/keuangan', name: 'Keuangan', description: 'Informasi keuangan masjid' },
+  { path: '/kontak', name: 'Kontak', description: 'Hubungi pengurus masjid' },
   { path: '/laporan/keuangan', name: 'Laporan Keuangan', description: 'Transparansi keuangan masjid' },
   { path: '/laporan/waqaf', name: 'Laporan Waqaf', description: 'Laporan donasi waqaf' },
+  { path: '/pengumuman', name: 'Pengumuman', description: 'Pengumuman penting masjid' },
+  { path: '/profil', name: 'Profil', description: 'Profil masjid' },
+  { path: '/program-kerja', name: 'Program Kerja', description: 'Program kerja masjid' },
   { path: '/tausiyah', name: 'Tausiyah', description: 'Artikel islami' },
-  { path: '/beranda', name: 'Beranda', description: 'Halaman utama' },
+  { path: '/tentang-kami', name: 'Tentang Kami', description: 'Tentang masjid kami' },
+  { path: '/zakat-infaq', name: 'Zakat & Infaq', description: 'Informasi zakat dan infaq' },
+  { path: '/sign-in', name: 'Sign In', description: 'Masuk ke akun anda' },
+  { path: '/sign-up', name: 'Sign Up', description: 'Daftar akun baru' }
 ];
 
-export default function SearchPage({
+function SearchPageContent({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -147,5 +162,17 @@ export default function SearchPage({
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPageContent searchParams={searchParams} />
+    </Suspense>
   );
 }
