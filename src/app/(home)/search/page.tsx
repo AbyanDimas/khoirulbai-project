@@ -44,13 +44,13 @@ const availablePages = [
     icon: <Book className="w-4 h-4" />,
   },
   {
-    path: "/alquran/surah/[nomor]",
+    path: "/alquran/surah/[1]",
     name: "Surah Al-Quran",
     description: "Baca surah Al-Quran",
     icon: <Book className="w-4 h-4" />,
   },
   {
-    path: "/alquran/surah/[nomor]/tafsir",
+    path: "/alquran/surah/[1]/tafsir",
     name: "Tafsir Surah",
     description: "Tafsir ayat Al-Quran",
     icon: <Book className="w-4 h-4" />,
@@ -59,12 +59,6 @@ const availablePages = [
     path: "/berita",
     name: "Berita",
     description: "Berita terbaru seputar masjid",
-    icon: <BookOpen className="w-4 h-4" />,
-  },
-  {
-    path: "/berita/[id]",
-    name: "Detail Berita",
-    description: "Detail berita masjid",
     icon: <BookOpen className="w-4 h-4" />,
   },
   {
@@ -283,7 +277,7 @@ function SearchPageContent() {
     {
       name: "Keuangan",
       pages: availablePages.filter(
-        (page) => page.path === "/keuangan" || page.path === "/wakaf"
+        (page) => page.path === "/keuangan" || page.path === "/laporan/waqaf"
       ),
       icon: <DollarSign className="w-4 h-4" />,
     },
@@ -291,7 +285,7 @@ function SearchPageContent() {
       name: "Lainnya",
       pages: availablePages.filter(
         (page) =>
-          !["/agenda", "/berita", "/tausiyah", "/keuangan", "/wakaf"].includes(
+          !["/agenda", "/berita", "/tausiyah", "/keuangan", "/laporan/waqaf"].includes(
             page.path
           ) && !page.name.includes("Jadwal")
       ),
@@ -321,6 +315,77 @@ function SearchPageContent() {
                 </span>
                 "
               </h1>
+
+              {/* Search Results Section - Added this */}
+              {searchResults.length > 0 ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mb-8"
+                >
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                    Halaman yang ditemukan
+                  </h3>
+                  <div className="space-y-3">
+                    {searchResults.map((page) => (
+                      <motion.div
+                        key={page.path}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <Link
+                          href={page.path}
+                          className="block p-4 bg-white dark:bg-gray-800 hover:bg-emerald-50 dark:hover:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition-all"
+                        >
+                          <div className="flex items-center">
+                            <span className="text-emerald-600 dark:text-emerald-400 mr-3">
+                              {page.icon}
+                            </span>
+                            <div>
+                              <h4 className="font-medium text-emerald-700 dark:text-emerald-400">
+                                {page.name}
+                              </h4>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">
+                                {page.description}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : searchResults.length === 0 && query ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-8"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="64"
+                    height="64"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mx-auto text-gray-300 dark:text-gray-600 mb-4"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2">
+                    Tidak ditemukan
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-500">
+                    Tidak ada halaman yang cocok dengan pencarian Anda.
+                  </p>
+                </motion.div>
+              ) : null}
 
               {(aiResponse || isLoadingAi) && (
                 <motion.div
