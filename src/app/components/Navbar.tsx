@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -30,12 +30,13 @@ import {
   Newspaper as NewsIcon,
   Image as GalleryIcon,
   MoreHorizontal,
-  Apple
+  Apple,
+  LogOut
 } from 'lucide-react'
-import { UserButton, useUser } from '@clerk/nextjs'
 
 const Navbar = () => {
   const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState({
     jadwal: false,
@@ -44,11 +45,16 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const { theme, setTheme } = useTheme()
-  const { user, isSignedIn } = useUser()
   const [mounted, setMounted] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
     setMounted(true)
+    // Check if user is logged in
+    const userData = localStorage.getItem('user')
+    if (userData) {
+      setUser(JSON.parse(userData))
+    }
   }, [])
 
   const toggleDropdown = (name: 'jadwal' | 'lainnya') => {
@@ -67,6 +73,14 @@ const Navbar = () => {
     console.log('Searching for:', searchQuery)
     setSearchQuery('')
     setSearchOpen(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwt')
+    localStorage.removeItem('user')
+    setUser(null)
+    router.push('/')
+    setIsOpen(false)
   }
 
   if (!mounted) return null
@@ -407,32 +421,53 @@ const Navbar = () => {
             </button>
 
             {/* User button */}
-            {isSignedIn ? (
-              <div className="flex items-center space-x-2 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
-                <UserButton 
-                  afterSignOutUrl="/" 
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: "h-8 w-8",
-                      userButtonPopoverCard: "dark:bg-gray-800 dark:border-gray-700"
-                    }
-                  }} 
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {user?.firstName || 'Profile'}
-                </span>
+            {user ? (
+              <div className="relative">
+                <button
+                  className="flex items-center space-x-2 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                  onClick={() => toggleDropdown('user')}
+                >
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300">
+                    <User className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {user.username || 'Profile'}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {dropdownOpen.user && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
+                    >
+                      <div className="py-1">
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Link
-                  href="/sign-in"
+                  href="/login"
                   className="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   Login
                 </Link>
                 <Link
-                  href="/sign-up"
+                  href="/signup"
                   className="flex items-center px-3 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-200"
                 >
                   <UserPlus className="h-4 w-4 mr-2" />
@@ -743,25 +778,27 @@ const Navbar = () => {
               </AnimatePresence>
 
               <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
-                {isSignedIn ? (
-                  <div className="flex items-center px-3 py-3">
-                    <UserButton 
-                      afterSignOutUrl="/" 
-                      appearance={{
-                        elements: {
-                          userButtonAvatarBox: "h-8 w-8",
-                          userButtonPopoverCard: "dark:bg-gray-800 dark:border-gray-700"
-                        }
-                      }} 
-                    />
-                    <span className="ml-3 text-base font-medium text-gray-700 dark:text-gray-300">
-                      {user?.firstName || 'Profile'}
-                    </span>
+                {user ? (
+                  <div className="flex items-center justify-between px-3 py-3">
+                    <div className="flex items-center">
+                      <div className="flex items-center justify-center h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300">
+                        <User className="h-4 w-4" />
+                      </div>
+                      <span className="ml-3 text-base font-medium text-gray-700 dark:text-gray-300">
+                        {user.username || 'Profile'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2 px-3">
                     <Link
-                      href="/sign-in"
+                      href="/login"
                       className="flex items-center justify-center px-4 py-2 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
                       onClick={() => setIsOpen(false)}
                     >
@@ -769,7 +806,7 @@ const Navbar = () => {
                       Login
                     </Link>
                     <Link
-                      href="/sign-up"
+                      href="/signup"
                       className="flex items-center justify-center px-4 py-2 rounded-lg text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-200"
                       onClick={() => setIsOpen(false)}
                     >

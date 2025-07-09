@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UserButton, useUser } from '@clerk/nextjs'
 import NavLogo from './NavLogo'
 import DesktopMenu from './DesktopMenu'
 import MobileMenu from './MobileMenu'
@@ -25,11 +24,20 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const { theme } = useTheme()
-  const { user, isSignedIn } = useUser()
   const [mounted, setMounted] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [isSignedIn, setIsSignedIn] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    // Check for existing session
+    const userData = localStorage.getItem('user')
+    const jwt = localStorage.getItem('jwt')
+    
+    if (userData && jwt) {
+      setUser(JSON.parse(userData))
+      setIsSignedIn(true)
+    }
   }, [])
 
   const toggleDropdown = (name: 'jadwal' | 'lainnya') => {
@@ -46,6 +54,15 @@ const Navbar = () => {
     }
     setSearchQuery('')
     setSearchOpen(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwt')
+    localStorage.removeItem('user')
+    setUser(null)
+    setIsSignedIn(false)
+    router.push('/')
+    setIsOpen(false)
   }
 
   if (!mounted) return null
@@ -73,7 +90,11 @@ const Navbar = () => {
             
             <ThemeToggle />
             
-            <UserSection isSignedIn={isSignedIn ?? false} user={user} />
+            <UserSection 
+              isSignedIn={isSignedIn} 
+              user={user} 
+              onLogout={handleLogout}
+            />
           </div>
 
           <div className="flex items-center md:hidden">
@@ -122,8 +143,9 @@ const Navbar = () => {
         dropdownOpen={dropdownOpen}
         toggleDropdown={toggleDropdown}
         setIsOpen={setIsOpen}
-        isSignedIn={isSignedIn ?? false}
+        isSignedIn={isSignedIn}
         user={user}
+        onLogout={handleLogout}
       />
     </nav>
   )
