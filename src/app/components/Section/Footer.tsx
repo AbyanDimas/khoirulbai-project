@@ -29,7 +29,6 @@ export const Footer = () => {
           <div>
             <h3 className="text-white text-lg font-bold mb-4">Tautan Cepat</h3>
             <ul className="space-y-2">
-              <li><Link href="/tentang-kami" className="hover:text-white transition-colors">Tentang Kami</Link></li>
               <li><Link href="/jadwal" className="hover:text-white transition-colors">Jadwal Sholat</Link></li>
               <li><Link href="/kajian" className="hover:text-white transition-colors">Kajian Rutin</Link></li>
               <li><Link href="/donasi" className="hover:text-white transition-colors">Donasi</Link></li>
@@ -51,11 +50,11 @@ export const Footer = () => {
             <address className="not-italic space-y-2">
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-                <span>Jl. Raya Adiwerna No.Km. 5, Kaliwadas, Kec. Adiwerna, Kabupaten Tegal, Jawa Tengah 52194</span>
+              <span>Jl. Raya II, Pekuncen, Pesarean, Kec. Adiwerna, Kabupaten Tegal, Jawa Tengah 52194</span>
               </div>
               <div className="flex items-center">
                 <Phone className="h-5 w-5 mr-2" />
-                <span>-</span>
+                <span>+62 856-4013-0536</span>
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 mr-2" />
