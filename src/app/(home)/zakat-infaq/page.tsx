@@ -276,7 +276,7 @@ const ZakatDanInfaq = () => {
                   </div>
                   <h3 className="font-bold mb-2 dark:text-white">Transfer Bank</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    Rekening BSI 7123718237 a.n Khoirul Ba'i (Konfirmasi via WA 0812-3456-7890)
+                    Rekening BSI 7998006664 a.n. PANITIA REHAB MASJID KHOIRUL BAI
                   </p>
                 </div>
                 <div className="border border-gray-200 dark:border-gray-700 p-4 rounded-lg">
