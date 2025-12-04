@@ -7,6 +7,29 @@ import { useEffect, useState } from 'react';
 import { Berita } from '@/app/types';
 import { BeritaCard } from '@/app/components/Section/BeritaCard';
 
+function getImageUrl(img: any) {
+    const BASE = process.env.NEXT_PUBLIC_IMAGE_URL; // contoh: http://10.2.2.160:1337
+
+    if (!img) return null;
+
+    if (img.url) {
+    return img.url.startsWith("http")
+        ? img.url
+        : `${BASE}${img.url}`;
+    }
+
+    if (img.formats?.large?.url)
+    return `${BASE}${img.formats.large.url}`;
+    if (img.formats?.medium?.url)
+    return `${BASE}${img.formats.medium.url}`;
+    if (img.formats?.small?.url)
+    return `${BASE}${img.formats.small.url}`;
+    if (img.formats?.thumbnail?.url)
+    return `${BASE}${img.formats.thumbnail.url}`;
+
+    return null;
+}
+
 export const LatestBerita = () => {
   const [berita, setBerita] = useState<Berita[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,26 +50,41 @@ export const LatestBerita = () => {
         const data = await response.json();
 
         const formattedBerita = data.data.map((item: any) => {
-          let imageUrl = '/placeholder.jpg';
-          if (item.attributes.image?.data?.attributes?.url) {
-            if (item.attributes.image.data.attributes.url.startsWith('http')) {
-              imageUrl = item.attributes.image.data.attributes.url;
-            } else {
-              imageUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.attributes.image.data.attributes.url}`;
-            }
+          const attributes = item.attributes || item;
+          const imageUrl = getImageUrl(attributes.image);
+
+          let content = "";
+          if (Array.isArray(attributes.content)) {
+            content = attributes.content
+              .map((block: any) => {
+                if (
+                  block.type === "paragraph" &&
+                  Array.isArray(block.children)
+                ) {
+                  return block.children
+                    .map((child: any) => child.text)
+                    .join(" ");
+                }
+                return "";
+              })
+              .join(" ");
+          } else if (typeof attributes.content === "string") {
+            content = attributes.content;
+          } else if (attributes.content) {
+            content = JSON.stringify(attributes.content);
           }
 
           return {
             id: item.id.toString(),
-            title: item.attributes.name,
-            content: item.attributes.content,
-            slug: item.attributes.slug,
-            date: new Date(item.attributes.createdAt).toLocaleDateString('id-ID', {
+            title: attributes.name,
+            content: content,
+            slug: attributes.slug,
+            date: new Date(attributes.createdAt).toLocaleDateString('id-ID', {
               day: 'numeric',
               month: 'short',
               year: 'numeric'
             }),
-            category: item.attributes.category || 'Berita',
+            category: attributes.category || 'Berita',
             image: imageUrl
           };
         });
