@@ -1,21 +1,30 @@
-'use client';
+"use client";
 
-import { AlertCircle, ChevronRight, Calendar, Megaphone, Clock, Loader2, RefreshCw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { Announcement } from '@/app/types';
+import {
+  AlertCircle,
+  ChevronRight,
+  Calendar,
+  Megaphone,
+  Clock,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Announcement } from "@/app/types";
 
 // Color variations for cards
 const cardColors = [
-  'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-900/20 border-l-4 border-blue-400',
-  'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-900/20 border-l-4 border-green-400',
-  'bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-900/20 border-l-4 border-purple-400',
-  'bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/20 border-l-4 border-amber-400',
-  'bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/30 dark:to-pink-900/20 border-l-4 border-pink-400'
+  "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-900/20 border-l-4 border-blue-400",
+  "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-900/20 border-l-4 border-green-400",
+  "bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-900/20 border-l-4 border-purple-400",
+  "bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/20 border-l-4 border-amber-400",
+  "bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/30 dark:to-pink-900/20 border-l-4 border-pink-400",
 ];
 
-const importantCardColor = 'bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-900/30 border-l-4 border-amber-500';
+const importantCardColor =
+  "bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-900/30 border-l-4 border-amber-500";
 
 export default function PengumumanPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -23,32 +32,56 @@ export default function PengumumanPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  const convertStrapiBlocks = (blocks: any): string => {
+    if (!blocks) return "Tidak ada deskripsi";
+
+    // Jika sudah string
+    if (typeof blocks === "string") return blocks;
+
+    // Jika formatnya array block (Strapi Rich Text)
+    if (Array.isArray(blocks)) {
+      return blocks
+        .map((block) => {
+          if (Array.isArray(block.children)) {
+            return block.children
+              .map((child: any) => child.text || "")
+              .join(" ");
+          }
+          return "";
+        })
+        .join("\n\n");
+    }
+
+    return "";
+  };
+
   const fetchAllAnnouncements = async () => {
     try {
       setLoading(true);
       setRefreshing(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/pengunguman-pentings?populate=*&sort[0]=tanggal:desc`
+        `${process.env.NEXT_PUBLIC_API_URL}/pengumuman-pentings?populate=*&sort[0]=tanggal:desc`,
       );
-      
+
       if (!response.ok) {
-        throw new Error('Gagal memuat pengumuman');
+        throw new Error("Gagal memuat pengumuman");
       }
 
       const data = await response.json();
 
       const formattedAnnouncements = data.data.map((item: any) => ({
         id: item.id.toString(),
-        title: item.attributes.nama,
-        content: item.attributes.deskripsi || 'Tidak ada deskripsi',
-        important: item.attributes.penting || false
+        title: item.nama,
+        // content: item.deskripsi || "Tidak ada deskripsi",
+        content: convertStrapiBlocks(item.deskripsi),
+        important: item.penting || false,
       }));
 
       setAnnouncements(formattedAnnouncements);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
-      console.error('Error fetching announcements:', err);
+      setError(err instanceof Error ? err.message : "Terjadi kesalahan");
+      console.error("Error fetching announcements:", err);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -72,7 +105,7 @@ export default function PengumumanPage() {
             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
             className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full mb-4"
           />
-          <motion.p 
+          <motion.p
             animate={{ opacity: [0.6, 1, 0.6] }}
             transition={{ repeat: Infinity, duration: 2 }}
             className="text-gray-600 dark:text-gray-400"
@@ -129,7 +162,7 @@ export default function PengumumanPage() {
         transition={{ delay: 0.1 }}
         className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
       >
-<div>
+        <div>
           <h1 className="text-3xl font-bold dark:text-white flex items-center">
             <motion.span
               animate={{ rotate: [-5, 5, -5] }}
@@ -140,9 +173,11 @@ export default function PengumumanPage() {
             </motion.span>
             Pengumuman
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">Informasi terbaru dari Masjid Khoirul Ba'i STM ADB</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Informasi terbaru dari Masjid Khoirul Ba'i STM ADB
+          </p>
         </div>
-        
+
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -180,7 +215,8 @@ export default function PengumumanPage() {
               Memuat Pengumuman...
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-md mx-auto">
-              Sedang menunggu pengumuman terbaru dari Masjid Khoirul Ba'i STM ADB. Silakan tunggu sebentar.
+              Sedang menunggu pengumuman terbaru dari Masjid Khoirul Ba'i STM
+              ADB. Silakan tunggu sebentar.
             </p>
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -216,7 +252,7 @@ export default function PengumumanPage() {
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                       {announcement.important && (
-                        <motion.span 
+                        <motion.span
                           animate={{ scale: [1, 1.05, 1] }}
                           transition={{ repeat: Infinity, duration: 2 }}
                           className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200"
@@ -225,11 +261,15 @@ export default function PengumumanPage() {
                           Penting
                         </motion.span>
                       )}
-                      <h3 className={`text-xl font-bold ${announcement.important ? 'text-amber-900 dark:text-amber-100' : 'dark:text-white'}`}>
+                      <h3
+                        className={`text-xl font-bold ${announcement.important ? "text-amber-900 dark:text-amber-100" : "dark:text-white"}`}
+                      >
                         {announcement.title}
                       </h3>
                     </div>
-                    <p className={`text-gray-700 dark:text-gray-300 ${announcement.important ? 'dark:text-amber-100/90' : ''}`}>
+                    <p
+                      className={`text-gray-700 dark:text-gray-300 ${announcement.important ? "dark:text-amber-100/90" : ""}`}
+                    >
                       {announcement.content}
                     </p>
                   </div>
@@ -251,10 +291,7 @@ export default function PengumumanPage() {
             href="/"
             className="inline-flex items-center text-white dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 group transition-colors px-4 py-2 rounded-lg bg-orange-400 dark:bg-amber-900/20 dark:hover:bg-amber-900/30"
           >
-            <motion.span
-              whileHover={{ x: -3 }}
-              className="mr-2 inline-block"
-            >
+            <motion.span whileHover={{ x: -3 }} className="mr-2 inline-block">
               <ChevronRight className="rotate-180 transition-transform group-hover:-translate-x-1" />
             </motion.span>
             <span className="hover:underline">Kembali ke Beranda</span>
@@ -264,3 +301,4 @@ export default function PengumumanPage() {
     </div>
   );
 }
+

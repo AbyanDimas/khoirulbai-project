@@ -85,7 +85,6 @@ const Navbar = () => {
               setSearchOpen={setSearchOpen}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
-              handleSearch={handleSearch}
             />
             
             <ThemeToggle />

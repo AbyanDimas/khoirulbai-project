@@ -1,8 +1,10 @@
+import React from 'react';
+
 export type PrayerTime = {
   name: string;
   time: string;
   passed: boolean;
-  icon: JSX.Element;
+  icon: React.ReactNode;
 };
 
 export type PrayerSchedule = {
@@ -22,7 +24,7 @@ export type Event = {
 };
 
 export type Service = {
-  icon: JSX.Element;
+  icon: React.ReactNode;
   title: string;
   description: string;
   link: string;
@@ -62,7 +64,7 @@ export type Announcement = {
 export type StatItem = {
   name: string;
   value: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
 };
 
 export interface Berita {

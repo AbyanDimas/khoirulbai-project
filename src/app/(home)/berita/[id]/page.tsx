@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   Clock,
@@ -10,12 +11,6 @@ import {
   MoreHorizontal,
   User,
   MessageSquare,
-  ThumbsUp,
-  Facebook,
-  Twitter,
-  Linkedin,
-  MessageCircle,
-  Link as LinkIcon,
   CalendarDays,
   Image as ImageIcon,
   Copy,
@@ -23,7 +18,6 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Head from "next/head";
 
 type BeritaItem = {
@@ -49,7 +43,134 @@ type BeritaItem = {
   }[];
 };
 
-const BeritaDetails = ({ params }: { params: { id: string } }) => {
+// ==========================
+// FIX IMAGE URL FUNGSI SAMA DENGAN HALAMAN BERITA
+// ==========================
+function getImageUrl(img: any): string | null {
+  const BASE =
+    process.env.NEXT_PUBLIC_IMAGE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:1337";
+
+  if (!img) return null;
+
+  // Jika img sudah memiliki url langsung
+  if (img.url) {
+    return img.url.startsWith("http") ? img.url : `${BASE}${img.url}`;
+  }
+
+  // Jika img adalah objek dengan format nested (Strapi format)
+  if (img.data?.attributes) {
+    const attributes = img.data.attributes;
+    if (attributes.url) {
+      return attributes.url.startsWith("http")
+        ? attributes.url
+        : `${BASE}${attributes.url}`;
+    }
+
+    // Cek formats
+    if (attributes.formats) {
+      if (attributes.formats.large?.url)
+        return `${BASE}${attributes.formats.large.url}`;
+      if (attributes.formats.medium?.url)
+        return `${BASE}${attributes.formats.medium.url}`;
+      if (attributes.formats.small?.url)
+        return `${BASE}${attributes.formats.small.url}`;
+      if (attributes.formats.thumbnail?.url)
+        return `${BASE}${attributes.formats.thumbnail.url}`;
+    }
+  }
+
+  // Coba formats langsung
+  if (img.formats?.large?.url) return `${BASE}${img.formats.large.url}`;
+  if (img.formats?.medium?.url) return `${BASE}${img.formats.medium.url}`;
+  if (img.formats?.small?.url) return `${BASE}${img.formats.small.url}`;
+  if (img.formats?.thumbnail?.url) return `${BASE}${img.formats.thumbnail.url}`;
+
+  return null;
+}
+
+// ==========================
+// FUNGSI UNTUK PARSING KONTEN RICH TEXT
+// ==========================
+function parseRichTextContent(content: any): string {
+  if (!content) return "";
+
+  // Jika konten berupa string langsung
+  if (typeof content === "string") {
+    return content
+      .split("\n\n")
+      .map(
+        (paragraph: string) => `<p style="margin-bottom: 1em">${paragraph}</p>`,
+      )
+      .join("");
+  }
+
+  // Jika konten berupa array (Strapi Rich Text)
+  if (Array.isArray(content)) {
+    let html = "";
+    for (const block of content) {
+      if (block.type === "paragraph" && Array.isArray(block.children)) {
+        const text = block.children
+          .filter((child: any) => child.text)
+          .map((child: any) => child.text)
+          .join("");
+        if (text.trim()) {
+          html += `<p style="margin-bottom: 1em">${text}</p>`;
+        }
+      }
+    }
+    return html;
+  }
+
+  // Fallback ke JSON string
+  return JSON.stringify(content || "");
+}
+
+// ==========================
+// IMAGE COMPONENT
+// ==========================
+const NewsImage = ({
+  src,
+  alt,
+  className = "",
+}: {
+  src: string | null;
+  alt: string;
+  className?: string;
+}) => {
+  if (!src) {
+    return (
+      <div
+        className={`absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center ${className}`}
+      >
+        <ImageIcon size={32} className="text-gray-400" />
+      </div>
+    );
+  }
+
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
+  ) => {
+    const target = e.target as HTMLImageElement;
+    target.onerror = null;
+    target.src =
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800";
+  };
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={`absolute inset-0 w-full h-full object-cover ${className}`}
+      onError={handleImageError}
+      crossOrigin="anonymous"
+    />
+  );
+};
+
+const BeritaDetails = () => {
+  const params = useParams<{ id: string }>();
   const [berita, setBerita] = useState<BeritaItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [relatedNews, setRelatedNews] = useState<any[]>([]);
@@ -62,8 +183,8 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
-    
-    if (params) {
+
+    if (params && params.id) {
       setSlug(params.id);
       fetchData(params.id);
     }
@@ -73,46 +194,49 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
     try {
       setLoading(true);
 
-      // Fetch main news
+      // Fetch main news - KONSISTEN DENGAN HALAMAN BERITA
       const newsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$eq]=${id}&populate=*`
+        `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$eq]=${id}&populate=*`,
       );
+
+      if (!newsResponse.ok) {
+        throw new Error(`HTTP error! status: ${newsResponse.status}`);
+      }
+
       const newsData = await newsResponse.json();
+      console.log("API Response for detail:", newsData);
 
       if (newsData.data.length > 0) {
-        const newsItem = newsData.data[0].attributes;
-        let imageUrl = null;
+        const newsItem = newsData.data[0].attributes || newsData.data[0];
 
-        if (newsItem.image?.data?.attributes?.url) {
-          if (newsItem.image.data.attributes.url.startsWith("http")) {
-            imageUrl = newsItem.image.data.attributes.url;
-          } else {
-            imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${newsItem.image.data.attributes.url}`;
-          }
-        }
+        // Gunakan fungsi getImageUrl yang sama dengan halaman berita
+        const imageUrl = getImageUrl(newsItem.image);
+        console.log("Generated image URL:", imageUrl);
 
-        const processedContent = newsItem.content
-          .split("\n\n")
-          .map(
-            (paragraph: string) =>
-              `<p style="margin-bottom: 1em">${paragraph}</p>`
-          )
-          .join("");
+        // Gunakan fungsi parseRichTextContent untuk konsistensi
+        const processedContent = parseRichTextContent(newsItem.content);
 
-        const formattedNews = {
+        const formattedNews: BeritaItem = {
           id: id,
-          title: newsItem.name,
+          title: newsItem.name || newsItem.judul_berita || "Tanpa Judul",
           content: processedContent,
-          category: newsItem.category,
-          date: new Date(newsItem.createdAt).toLocaleDateString("id-ID", {
+          category: newsItem.category || "kegiatan",
+          date: new Date(
+            newsItem.publishedAt || newsItem.createdAt || new Date(),
+          ).toLocaleDateString("id-ID", {
             year: "numeric",
             month: "long",
             day: "numeric",
           }),
-          time: new Date(newsItem.waktu).toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          time: newsItem.waktu
+            ? new Date(`2000-01-01T${newsItem.waktu}`).toLocaleTimeString(
+                "id-ID",
+                {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                },
+              )
+            : "00:00",
           author: "Tim Media Masjid",
           location: "Masjid Khoerul Ba'i",
           images: imageUrl
@@ -120,8 +244,9 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
                 {
                   url: imageUrl,
                   alt:
-                    newsItem.image.data.attributes.alternativeText ||
-                    newsItem.name,
+                    newsItem.image?.data?.attributes?.alternativeText ||
+                    newsItem.name ||
+                    "Gambar berita",
                 },
               ]
             : [],
@@ -130,29 +255,38 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
 
         setBerita(formattedNews);
 
-        // Fetch related news with images
+        // Fetch related news - KONSISTEN DENGAN HALAMAN BERITA
         const relatedResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$ne]=${id}&pagination[limit]=3&populate=*`
+          `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$ne]=${id}&pagination[limit]=3&populate=*`,
         );
-        const relatedData = await relatedResponse.json();
 
-        const formattedRelated = relatedData.data.map((item: any) => ({
-          id: item.id.toString(),
-          title: item.attributes.name,
-          date: new Date(item.attributes.createdAt).toLocaleDateString("id-ID"),
-          category: item.attributes.category,
-          slug: item.attributes.slug,
-          image: item.attributes.image?.data?.attributes?.url
-            ? item.attributes.image.data.attributes.url.startsWith("http")
-              ? item.attributes.image.data.attributes.url
-              : `${process.env.NEXT_PUBLIC_API_URL}${item.attributes.image.data.attributes.url}`
-            : null,
-        }));
+        if (relatedResponse.ok) {
+          const relatedData = await relatedResponse.json();
 
-        setRelatedNews(formattedRelated);
+          const formattedRelated = relatedData.data.map((item: any) => {
+            const attrs = item.attributes || item;
+            const relatedImageUrl = getImageUrl(attrs.image);
+
+            return {
+              id: item.id.toString(),
+              title: attrs.name || attrs.judul_berita || "Tanpa Judul",
+              date: new Date(
+                attrs.publishedAt || attrs.createdAt || new Date(),
+              ).toLocaleDateString("id-ID"),
+              category: attrs.category || "kegiatan",
+              slug: attrs.slug || item.id.toString(),
+              image: relatedImageUrl,
+            };
+          });
+
+          setRelatedNews(formattedRelated);
+        }
+      } else {
+        throw new Error("Berita tidak ditemukan");
       }
     } catch (error) {
       console.error("Error fetching news:", error);
+      setBerita(null);
     } finally {
       setLoading(false);
     }
@@ -161,7 +295,7 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
   const handleNextImage = () => {
     if (berita?.images) {
       setCurrentImageIndex((prevIndex) =>
-        prevIndex === berita.images.length - 1 ? 0 : prevIndex + 1
+        prevIndex === berita.images.length - 1 ? 0 : prevIndex + 1,
       );
     }
   };
@@ -169,15 +303,17 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
   const handlePrevImage = () => {
     if (berita?.images) {
       setCurrentImageIndex((prevIndex) =>
-        prevIndex === 0 ? berita.images.length - 1 : prevIndex - 1
+        prevIndex === 0 ? berita.images.length - 1 : prevIndex - 1,
       );
     }
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   if (loading) {
@@ -185,14 +321,26 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
       <>
         <Head>
           <title>Memuat Berita - Masjid Khoerul Ba'i</title>
-          <meta name="description" content="Sedang memuat berita terbaru dari Masjid Khoerul Ba'i" />
+          <meta
+            name="description"
+            content="Sedang memuat berita terbaru dari Masjid Khoerul Ba'i"
+          />
         </Head>
         <div className="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
           <div className="flex flex-col items-center">
             <div className="relative w-12 h-12 mb-4">
-              <div className="absolute top-0 left-0 w-3 h-3 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '0s' }} />
-              <div className="absolute top-0 right-0 w-3 h-3 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '0.2s' }} />
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '0.4s' }} />
+              <div
+                className="absolute top-0 left-0 w-3 h-3 rounded-full bg-emerald-500 animate-bounce"
+                style={{ animationDelay: "0s" }}
+              />
+              <div
+                className="absolute top-0 right-0 w-3 h-3 rounded-full bg-emerald-500 animate-bounce"
+                style={{ animationDelay: "0.2s" }}
+              />
+              <div
+                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full bg-emerald-500 animate-bounce"
+                style={{ animationDelay: "0.4s" }}
+              />
             </div>
             <p className="text-gray-500 dark:text-gray-400">Memuat berita...</p>
           </div>
@@ -206,7 +354,10 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
       <>
         <Head>
           <title>Berita Tidak Ditemukan - Masjid Khoerul Ba'i</title>
-          <meta name="description" content="Berita yang Anda cari tidak ditemukan" />
+          <meta
+            name="description"
+            content="Berita yang Anda cari tidak ditemukan"
+          />
         </Head>
         <div className="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
           <div className="flex flex-col items-center text-center p-6 max-w-md">
@@ -236,17 +387,29 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
     <>
       <Head>
         <title>{berita.title} - Masjid Khoerul Ba'i</title>
-        <meta name="description" content={berita.content.replace(/<[^>]*>/g, '').substring(0, 160)} />
+        <meta
+          name="description"
+          content={berita.content.replace(/<[^>]*>/g, "").substring(0, 160)}
+        />
         <meta property="og:title" content={berita.title} />
-        <meta property="og:description" content={berita.content.replace(/<[^>]*>/g, '').substring(0, 160)} />
-        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+        <meta
+          property="og:description"
+          content={berita.content.replace(/<[^>]*>/g, "").substring(0, 160)}
+        />
+        <meta
+          property="og:url"
+          content={typeof window !== "undefined" ? window.location.href : ""}
+        />
         <meta property="og:type" content="article" />
         {berita.images.length > 0 && (
           <meta property="og:image" content={berita.images[0].url} />
         )}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={berita.title} />
-        <meta name="twitter:description" content={berita.content.replace(/<[^>]*>/g, '').substring(0, 160)} />
+        <meta
+          name="twitter:description"
+          content={berita.content.replace(/<[^>]*>/g, "").substring(0, 160)}
+        />
         {berita.images.length > 0 && (
           <meta name="twitter:image" content={berita.images[0].url} />
         )}
@@ -324,13 +487,9 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
               transition={{ delay: 0.2 }}
               className="relative rounded-xl overflow-hidden mb-8 h-64 md:h-80 bg-gray-300 dark:bg-gray-700"
             >
-              <Image
+              <NewsImage
                 src={berita.images[currentImageIndex].url}
                 alt={berita.images[currentImageIndex].alt || berita.title}
-                fill
-                className="object-cover"
-                priority
-                onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30" />
               <div className="absolute bottom-4 left-4 text-white">
@@ -394,19 +553,15 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`relative aspect-square overflow-hidden rounded-lg ${
-                      currentImageIndex === index ? "ring-2 ring-emerald-500" : ""
+                      currentImageIndex === index
+                        ? "ring-2 ring-emerald-500"
+                        : ""
                     }`}
                   >
-                    <Image
+                    <NewsImage
                       src={image.url}
                       alt={image.alt || berita.title}
-                      fill
                       className="object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = "/placeholder-image.jpg";
-                      }}
                     />
                   </button>
                 ))}
@@ -424,62 +579,76 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
               Bagikan Artikel Ini
             </h3>
             <div className="flex flex-wrap gap-3">
-              <div className="grid grid-cols-4 gap-4 ">
+              <div className="grid grid-cols-4 gap-4">
                 <a
                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                    window.location.href
+                    window.location.href,
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex flex-col items-center"
                 >
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mb-1">
-                    <Facebook size={24} className="text-white" />
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
                   </div>
                   <span className="text-xs dark:text-gray-300">Facebook</span>
                 </a>
 
                 <a
                   href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                    window.location.href
+                    window.location.href,
                   )}&text=${encodeURIComponent(berita.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex flex-col items-center"
                 >
                   <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center mb-1">
-                    <Twitter size={24} className="text-white" />
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                    </svg>
                   </div>
                   <span className="text-xs dark:text-gray-300">Twitter</span>
                 </a>
 
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(
-                    `${berita.title} - ${window.location.href}`
+                    `${berita.title} - ${window.location.href}`,
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex flex-col items-center"
                 >
                   <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-1">
-                    <MessageCircle size={24} className="text-white" />
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm6.99 6.98l-1.414 1.414-4.576 4.576-1.414-1.414L12 9.172l-4.242 4.243-1.414-1.415L12 6.343l6.99 6.637z" />
+                    </svg>
                   </div>
                   <span className="text-xs dark:text-gray-300">WhatsApp</span>
                 </a>
 
-                <a
-                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
-                    window.location.href
-                  )}&title=${encodeURIComponent(berita.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={copyToClipboard}
                   className="flex flex-col items-center"
                 >
-                  <div className="w-12 h-12 rounded-full bg-blue-700 flex items-center justify-center mb-1">
-                    <Linkedin size={24} className="text-white" />
+                  <div className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center mb-1">
+                    <Copy size={24} className="text-white" />
                   </div>
-                  <span className="text-xs dark:text-gray-300">LinkedIn</span>
-                </a>
+                  <span className="text-xs dark:text-gray-300">Salin Link</span>
+                </button>
               </div>
             </div>
           </motion.div>
@@ -495,7 +664,7 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
                 size={20}
                 className="mr-2 text-emerald-600 dark:text-emerald-400"
               />
-              Komentar (?)
+              Komentar
             </h3>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow mb-4">
@@ -526,50 +695,44 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
             <h3 className="text-xl font-bold dark:text-white mb-6">
               Berita Terkait
             </h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              {relatedNews.map((news, index) => (
-                <motion.div
-                  key={news.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                  className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow"
-                >
-                  <Link href={`/berita/${news.slug}`} className="block">
-                    {news.image ? (
+            {relatedNews.length > 0 ? (
+              <div className="grid md:grid-cols-3 gap-4">
+                {relatedNews.map((news, index) => (
+                  <motion.div
+                    key={news.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow"
+                  >
+                    <Link href={`/berita/${news.slug}`} className="block">
                       <div className="relative h-40">
-                        <Image
-                          src={news.image}
-                          alt={news.title}
-                          fill
-                          className="object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.onerror = null;
-                            target.src = "/placeholder-image.jpg";
-                          }}
-                        />
+                        <NewsImage src={news.image || null} alt={news.title} />
+                        <div className="absolute top-2 left-2 z-10">
+                          <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
+                            {news.category}
+                          </span>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="h-40 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                        <ImageIcon size={32} className="text-gray-400" />
+                      <div className="p-4">
+                        <h4 className="font-bold dark:text-white line-clamp-2">
+                          {news.title}
+                        </h4>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                          {news.date}
+                        </p>
                       </div>
-                    )}
-                    <div className="p-4">
-                      <span className="inline-block bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-2 py-1 rounded-full mb-2">
-                        {news.category}
-                      </span>
-                      <h4 className="font-bold dark:text-white line-clamp-2">
-                        {news.title}
-                      </h4>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-                        {news.date}
-                      </p>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400">
+                  Belum ada berita terkait
+                </p>
+              </div>
+            )}
           </motion.div>
         </main>
 
@@ -605,10 +768,9 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
                   <div className="flex items-center space-x-4 mb-4">
                     {berita.images.length > 0 && !imageError ? (
                       <div className="relative w-16 h-16 rounded-lg overflow-hidden">
-                        <Image
+                        <NewsImage
                           src={berita.images[0].url}
                           alt={berita.images[0].alt || berita.title}
-                          fill
                           className="object-cover"
                         />
                       </div>
@@ -630,7 +792,9 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
                   <div className="mb-4">
                     <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
                       <div className="flex-1 truncate text-sm dark:text-gray-200">
-                        {window.location.href}
+                        {typeof window !== "undefined"
+                          ? window.location.href
+                          : ""}
                       </div>
                       <button
                         onClick={copyToClipboard}
@@ -661,59 +825,75 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
                 <div className="grid grid-cols-4 gap-4">
                   <a
                     href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      window.location.href
+                      typeof window !== "undefined" ? window.location.href : "",
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex flex-col items-center"
                   >
                     <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mb-1">
-                      <Facebook size={24} className="text-white" />
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                      </svg>
                     </div>
                     <span className="text-xs dark:text-gray-300">Facebook</span>
                   </a>
 
                   <a
                     href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                      window.location.href
+                      typeof window !== "undefined" ? window.location.href : "",
                     )}&text=${encodeURIComponent(berita.title)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex flex-col items-center"
                   >
                     <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center mb-1">
-                      <Twitter size={24} className="text-white" />
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                      </svg>
                     </div>
                     <span className="text-xs dark:text-gray-300">Twitter</span>
                   </a>
 
                   <a
                     href={`https://wa.me/?text=${encodeURIComponent(
-                      `${berita.title} - ${window.location.href}`
+                      `${berita.title} - ${typeof window !== "undefined" ? window.location.href : ""}`,
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex flex-col items-center"
                   >
                     <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-1">
-                      <MessageCircle size={24} className="text-white" />
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm6.99 6.98l-1.414 1.414-4.576 4.576-1.414-1.414L12 9.172l-4.242 4.243-1.414-1.415L12 6.343l6.99 6.637z" />
+                      </svg>
                     </div>
                     <span className="text-xs dark:text-gray-300">WhatsApp</span>
                   </a>
 
-                  <a
-                    href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
-                      window.location.href
-                    )}&title=${encodeURIComponent(berita.title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={copyToClipboard}
                     className="flex flex-col items-center"
                   >
-                    <div className="w-12 h-12 rounded-full bg-blue-700 flex items-center justify-center mb-1">
-                      <Linkedin size={24} className="text-white" />
+                    <div className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center mb-1">
+                      <Copy size={24} className="text-white" />
                     </div>
-                    <span className="text-xs dark:text-gray-300">LinkedIn</span>
-                  </a>
+                    <span className="text-xs dark:text-gray-300">
+                      Salin Link
+                    </span>
+                  </button>
                 </div>
               </motion.div>
             </motion.div>
@@ -725,3 +905,4 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
 };
 
 export default BeritaDetails;
+

@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import {
   Search,
   Grid2X2,
   List,
@@ -17,171 +17,316 @@ import {
   Share2,
   Heart,
   ArrowLeft,
-  Images
-} from 'lucide-react'
+  Images,
+} from "lucide-react";
 
 type GalleryItem = {
-  id: string
-  type: 'image' | 'video'
-  title: string
-  date: string
-  url: string
-  category: string
-  liked?: boolean
-  description?: string
-}
+  id: string;
+  type: "image" | "video";
+  title: string;
+  date: string;
+  url: string;
+  category: string;
+  liked?: boolean;
+  description?: string;
+};
 
 const categories = [
-  { name: 'Semua', icon: <Grid2X2 size={16} /> },
-  { name: 'Gambar', icon: <ImageIcon size={16} /> },
-  { name: 'Video', icon: <Video size={16} /> },
-  { name: 'Album', icon: <Album size={16} /> }
-]
+  { name: "Semua", icon: <Grid2X2 size={16} /> },
+  { name: "Image", icon: <ImageIcon size={16} /> },
+  { name: "Video", icon: <Video size={16} /> },
+  { name: "Album", icon: <Album size={16} /> },
+];
+
+// ==========================
+// FIX IMAGE URL FUNGSI SAMA DENGAN HALAMAN BERITA
+// ==========================
+function getImageUrl(img: any): string | null {
+  const BASE =
+    process.env.NEXT_PUBLIC_IMAGE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:1337";
+
+  if (!img) return null;
+
+  // Jika img sudah memiliki url langsung
+  if (img.url) {
+    return img.url.startsWith("http") ? img.url : `${BASE}${img.url}`;
+  }
+
+  // Jika img adalah objek dengan format nested (Strapi format)
+  if (img.data?.attributes) {
+    const attributes = img.data.attributes;
+    if (attributes.url) {
+      return attributes.url.startsWith("http")
+        ? attributes.url
+        : `${BASE}${attributes.url}`;
+    }
+
+    // Cek formats
+    if (attributes.formats) {
+      if (attributes.formats.large?.url)
+        return `${BASE}${attributes.formats.large.url}`;
+      if (attributes.formats.medium?.url)
+        return `${BASE}${attributes.formats.medium.url}`;
+      if (attributes.formats.small?.url)
+        return `${BASE}${attributes.formats.small.url}`;
+      if (attributes.formats.thumbnail?.url)
+        return `${BASE}${attributes.formats.thumbnail.url}`;
+    }
+  }
+
+  // Coba formats langsung
+  if (img.formats?.large?.url) return `${BASE}${img.formats.large.url}`;
+  if (img.formats?.medium?.url) return `${BASE}${img.formats.medium.url}`;
+  if (img.formats?.small?.url) return `${BASE}${img.formats.small.url}`;
+  if (img.formats?.thumbnail?.url) return `${BASE}${img.formats.thumbnail.url}`;
+
+  return null;
+}
+
+// ==========================
+// FUNGSI UNTUK PARSING DESKRIPSI RICH TEXT
+// ==========================
+function parseDescription(desc: any): string {
+  if (!desc) return "";
+
+  // Jika deskripsi berupa string langsung
+  if (typeof desc === "string") {
+    return desc;
+  }
+
+  // Jika deskripsi berupa array (Strapi Rich Text)
+  if (Array.isArray(desc)) {
+    let text = "";
+    for (const block of desc) {
+      if (block.type === "paragraph" && Array.isArray(block.children)) {
+        const paragraphText = block.children
+          .filter((child: any) => child.text)
+          .map((child: any) => child.text)
+          .join("");
+        if (paragraphText.trim()) {
+          text += paragraphText + " ";
+        }
+      }
+    }
+    return text.trim();
+  }
+
+  // Fallback ke JSON string
+  return JSON.stringify(desc || "");
+}
 
 const GalleryPage = () => {
-  const [activeCategory, setActiveCategory] = useState('Semua')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showThumbnails, setShowThumbnails] = useState(false)
+  const [activeCategory, setActiveCategory] = useState("Semua");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showThumbnails, setShowThumbnails] = useState(false);
 
   useEffect(() => {
     const fetchGalleryItems = async () => {
       try {
-        setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/galeris?populate=*`)
+        setLoading(true);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/galeris?populate=*`,
+        );
+        console.log(
+          "Fetching gallery from:",
+          `${process.env.NEXT_PUBLIC_API_URL}/galeris?populate=*`,
+        );
+
         if (!response.ok) {
-          throw new Error('Failed to fetch gallery items')
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json()
-        
+
+        const data = await response.json();
+        console.log("Gallery API Response:", data);
+
         const formattedItems = data.data.map((item: any) => {
-          let imageUrl = '/placeholder.jpg';
-          if (item.attributes.gambar?.data?.attributes?.url) {
-            if (item.attributes.gambar.data.attributes.url.startsWith('http')) {
-              imageUrl = item.attributes.gambar.data.attributes.url;
-            } else {
-              imageUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.attributes.gambar.data.attributes.url}`;
-            }
-          }
+          const attrs = item.attributes || item;
+
+          // Gunakan fungsi getImageUrl yang sama dengan halaman berita
+          const imageUrl = getImageUrl(attrs.gambar);
+          console.log("Gallery item image URL:", imageUrl);
+
+          // Parse deskripsi jika ada
+          const description = parseDescription(attrs.deskripsi);
 
           return {
             id: item.id.toString(),
-            type: item.attributes.type === 'Video' ? 'video' : 'image',
-            title: item.attributes.judul,
-            description: item.attributes.deskripsi,
-            date: new Date(item.attributes.tanggal).toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
+            type: (attrs.type || "image").toLowerCase() as "image" | "video",
+            title: attrs.judul || "Tanpa Judul",
+            description: description,
+            date: new Date(
+              attrs.tanggal || attrs.publishedAt || new Date(),
+            ).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
             }),
-            url: imageUrl,
-            category: item.attributes.type,
-            liked: false
-          }
-        })
+            url: imageUrl || "/placeholder.jpg",
+            category: attrs.type || "Image",
+            liked: false,
+          };
+        });
 
-        setGalleryItems(formattedItems)
+        console.log("Formatted gallery items:", formattedItems);
+        setGalleryItems(formattedItems);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred')
-        console.error('Error fetching gallery items:', err)
+        const errorMsg =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMsg);
+        console.error("Error fetching gallery items:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchGalleryItems()
-  }, [])
+    fetchGalleryItems();
+  }, []);
 
   useEffect(() => {
     if (!lightboxOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeLightbox();
-      } else if (e.key === 'ArrowLeft') {
-        navigateLightbox('prev');
-      } else if (e.key === 'ArrowRight') {
-        navigateLightbox('next');
+      } else if (e.key === "ArrowLeft") {
+        navigateLightbox("prev");
+      } else if (e.key === "ArrowRight") {
+        navigateLightbox("next");
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxOpen, selectedItem]);
 
-  const filteredItems = galleryItems.filter(item => {
-    const matchesCategory = activeCategory === 'Semua' || item.category === activeCategory
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         item.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+  const filteredItems = galleryItems.filter((item) => {
+    const matchesCategory =
+      activeCategory === "Semua" || item.category === activeCategory;
+    const matchesSearch =
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.description || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const openLightbox = (item: GalleryItem) => {
-    setSelectedItem(item)
-    setLightboxOpen(true)
-  }
+    setSelectedItem(item);
+    setLightboxOpen(true);
+  };
 
   const closeLightbox = () => {
-    setLightboxOpen(false)
-    setTimeout(() => setSelectedItem(null), 300)
-  }
+    setLightboxOpen(false);
+    setTimeout(() => setSelectedItem(null), 300);
+  };
 
-  const navigateLightbox = (direction: 'prev' | 'next') => {
-    const currentIndex = filteredItems.findIndex(item => item.id === selectedItem?.id)
-    let newIndex
-    
-    if (direction === 'prev') {
-      newIndex = currentIndex === 0 ? filteredItems.length - 1 : currentIndex - 1
+  const navigateLightbox = (direction: "prev" | "next") => {
+    const currentIndex = filteredItems.findIndex(
+      (item) => item.id === selectedItem?.id,
+    );
+    let newIndex;
+
+    if (direction === "prev") {
+      newIndex =
+        currentIndex === 0 ? filteredItems.length - 1 : currentIndex - 1;
     } else {
-      newIndex = currentIndex === filteredItems.length - 1 ? 0 : currentIndex + 1
+      newIndex =
+        currentIndex === filteredItems.length - 1 ? 0 : currentIndex + 1;
     }
-    
-    setSelectedItem(filteredItems[newIndex])
-  }
+
+    setSelectedItem(filteredItems[newIndex]);
+  };
 
   const handleDownload = async (url: string, title: string) => {
     try {
-      const response = await fetch(url)
-      const blob = await response.blob()
-      const blobUrl = window.URL.createObjectURL(blob)
-      
-      const a = document.createElement('a')
-      a.href = blobUrl
-      a.download = title || 'download'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      
-      window.URL.revokeObjectURL(blobUrl)
+      if (!url || url === "/placeholder.jpg") {
+        alert("Gambar tidak tersedia untuk diunduh");
+        return;
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Download failed with status ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download =
+        `${title.replace(/[^a-z0-9]/gi, "_")}.jpg` || "gallery_image.jpg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
-      console.error('Error downloading file:', err)
-      alert('Gagal mengunduh file')
+      console.error("Error downloading file:", err);
+      alert("Gagal mengunduh file");
     }
-  }
+  };
 
   const toggleLike = (id: string) => {
-    setGalleryItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, liked: !item.liked } : item
-      )
-    )
-    
+    setGalleryItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, liked: !item.liked } : item,
+      ),
+    );
+
     if (selectedItem?.id === id) {
-      setSelectedItem(prev => prev ? { ...prev, liked: !prev.liked } : null)
+      setSelectedItem((prev) =>
+        prev ? { ...prev, liked: !prev.liked } : null,
+      );
     }
-  }
+  };
+
+  // ==========================
+  // IMAGE COMPONENT
+  // ==========================
+  const GalleryImage = ({
+    src,
+    alt,
+    className = "",
+  }: {
+    src: string;
+    alt: string;
+    className?: string;
+  }) => {
+    const handleImageError = (
+      e: React.SyntheticEvent<HTMLImageElement, Event>,
+    ) => {
+      const target = e.target as HTMLImageElement;
+      target.onerror = null;
+      target.src = "/placeholder.jpg";
+    };
+
+    return (
+      <img
+        src={src}
+        alt={alt}
+        className={`w-full h-full object-cover ${className}`}
+        onError={handleImageError}
+        crossOrigin="anonymous"
+        loading="lazy"
+      />
+    );
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -191,17 +336,19 @@ const GalleryPage = () => {
           <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
             <ImageIcon className="text-gray-400" size={40} />
           </div>
-          <h3 className="text-lg font-medium dark:text-white">Error loading gallery</h3>
+          <h3 className="text-lg font-medium dark:text-white">
+            Error loading gallery
+          </h3>
           <p className="text-gray-500 dark:text-gray-400 mt-1">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
           >
-            Try Again
+            Coba Lagi
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -210,8 +357,8 @@ const GalleryPage = () => {
       <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
         <div className="container mx-auto px-4 relative">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
           >
             <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
@@ -243,8 +390,8 @@ const GalleryPage = () => {
                   onClick={() => setActiveCategory(category.name)}
                   className={`flex items-center px-4 py-2 rounded-full text-sm whitespace-nowrap ${
                     activeCategory === category.name
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? "bg-emerald-600 text-white"
+                      : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                   }`}
                 >
                   <span className="mr-2">{category.icon}</span>
@@ -252,24 +399,24 @@ const GalleryPage = () => {
                 </button>
               ))}
             </div>
-            
+
             <div className="hidden md:flex space-x-1 ml-4">
               <button
-                onClick={() => setViewMode('grid')}
+                onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-full ${
-                  viewMode === 'grid' 
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
-                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  viewMode === "grid"
+                    ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                    : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
               >
                 <Grid2X2 size={20} />
               </button>
               <button
-                onClick={() => setViewMode('list')}
+                onClick={() => setViewMode("list")}
                 className={`p-2 rounded-full ${
-                  viewMode === 'list' 
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
-                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  viewMode === "list"
+                    ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                    : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
               >
                 <List size={20} />
@@ -281,15 +428,36 @@ const GalleryPage = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Cari foto atau video..."
+              className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:text-white"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
         {filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
               <ImageIcon className="text-gray-400" size={40} />
             </div>
-            <h3 className="text-lg font-medium dark:text-white">Tidak ada item yang ditemukan</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Coba gunakan kata kunci lain atau pilih kategori berbeda</p>
+            <h3 className="text-lg font-medium dark:text-white">
+              Tidak ada item yang ditemukan
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
+              Coba gunakan kata kunci lain atau pilih kategori berbeda
+            </p>
           </div>
-        ) : viewMode === 'grid' ? (
+        ) : viewMode === "grid" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredItems.map((item) => (
               <motion.div
@@ -299,17 +467,13 @@ const GalleryPage = () => {
                 transition={{ duration: 0.3 }}
                 className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow hover:shadow-lg transition-shadow duration-300"
               >
-                <div 
+                <div
                   className="relative aspect-video bg-gray-200 dark:bg-gray-700 cursor-pointer"
                   onClick={() => openLightbox(item)}
                 >
-                  <img 
-                    src={item.url} 
-                    alt={item.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
+                  <GalleryImage src={item.url} alt={item.title} />
                   <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors duration-300" />
-                  {item.type === 'video' && (
+                  {item.type === "video" && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">
                         <svg
@@ -332,24 +496,33 @@ const GalleryPage = () => {
                 </div>
                 <div className="p-4">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-medium dark:text-white line-clamp-2">{item.title}</h3>
-                    <button 
-                      className={`p-1 ${item.liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                    <h3 className="font-medium dark:text-white line-clamp-2">
+                      {item.title}
+                    </h3>
+                    <button
+                      className={`p-1 ${item.liked ? "text-red-500" : "text-gray-400 hover:text-red-500"}`}
                       onClick={(e) => {
-                        e.stopPropagation()
-                        toggleLike(item.id)
+                        e.stopPropagation();
+                        toggleLike(item.id);
                       }}
                     >
-                      <Heart 
-                        size={18} 
-                        fill={item.liked ? 'currentColor' : 'none'} 
+                      <Heart
+                        size={18}
+                        fill={item.liked ? "currentColor" : "none"}
                       />
                     </button>
                   </div>
                   <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-2">
-                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                    <span
+                      className={`inline-block w-2 h-2 rounded-full ${item.type === "video" ? "bg-red-500" : "bg-emerald-500"} mr-2`}
+                    ></span>
                     {item.category} • {item.date}
                   </div>
+                  {item.description && (
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -364,12 +537,12 @@ const GalleryPage = () => {
                 transition={{ duration: 0.3 }}
                 className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300 flex"
               >
-                <div 
+                <div
                   className="w-32 h-32 flex-shrink-0 bg-gray-200 dark:bg-gray-700 cursor-pointer relative"
                   onClick={() => openLightbox(item)}
                 >
-                  <img 
-                    src={item.url} 
+                  <GalleryImage
+                    src={item.url}
                     alt={item.title}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -378,18 +551,27 @@ const GalleryPage = () => {
                 <div className="p-4 flex-grow">
                   <div className="flex justify-between">
                     <div>
-                      <h3 className="font-medium dark:text-white">{item.title}</h3>
+                      <h3 className="font-medium dark:text-white">
+                        {item.title}
+                      </h3>
                       <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-1">
-                        <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                        <span
+                          className={`inline-block w-2 h-2 rounded-full ${item.type === "video" ? "bg-red-500" : "bg-emerald-500"} mr-2`}
+                        ></span>
                         {item.category} • {item.date}
                       </div>
+                      {item.description && (
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
+                          {item.description}
+                        </p>
+                      )}
                     </div>
                     <div className="flex space-x-2">
-                      <button 
+                      <button
                         className="p-1 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          handleDownload(item.url, item.title)
+                          e.stopPropagation();
+                          handleDownload(item.url, item.title);
                         }}
                       >
                         <Download size={18} />
@@ -397,26 +579,26 @@ const GalleryPage = () => {
                       <button className="p-1 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
                         <Share2 size={18} />
                       </button>
-                      <button 
-                        className={`p-1 ${item.liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                      <button
+                        className={`p-1 ${item.liked ? "text-red-500" : "text-gray-400 hover:text-red-500"}`}
                         onClick={(e) => {
-                          e.stopPropagation()
-                          toggleLike(item.id)
+                          e.stopPropagation();
+                          toggleLike(item.id);
                         }}
                       >
-                        <Heart 
-                          size={18} 
-                          fill={item.liked ? 'currentColor' : 'none'} 
+                        <Heart
+                          size={18}
+                          fill={item.liked ? "currentColor" : "none"}
                         />
                       </button>
                     </div>
                   </div>
                   <div className="mt-3 flex space-x-2">
-                    <button 
+                    <button
                       className="text-sm px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full"
                       onClick={(e) => {
-                        e.stopPropagation()
-                        openLightbox(item)
+                        e.stopPropagation();
+                        openLightbox(item);
                       }}
                     >
                       Lihat Detail
@@ -440,33 +622,33 @@ const GalleryPage = () => {
             className="fixed inset-0 z-50 bg-black/90 backdrop-blur flex items-center justify-center p-4"
             onClick={closeLightbox}
           >
-            <button 
+            <button
               className="absolute top-4 right-4 text-white hover:text-emerald-400 z-10"
               onClick={closeLightbox}
             >
               <X size={32} />
             </button>
-            
-            <button 
+
+            <button
               className="absolute left-4 text-white hover:text-emerald-400 z-10 p-2"
               onClick={(e) => {
-                e.stopPropagation()
-                navigateLightbox('prev')
+                e.stopPropagation();
+                navigateLightbox("prev");
               }}
             >
               <ChevronLeft size={32} />
             </button>
-            
-            <button 
+
+            <button
               className="absolute right-4 text-white hover:text-emerald-400 z-10 p-2"
               onClick={(e) => {
-                e.stopPropagation()
-                navigateLightbox('next')
+                e.stopPropagation();
+                navigateLightbox("next");
               }}
             >
               <ChevronRight size={32} />
             </button>
-            
+
             <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col">
               <motion.div
                 key={selectedItem.id}
@@ -478,8 +660,8 @@ const GalleryPage = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="aspect-video bg-gray-800 flex items-center justify-center relative flex-grow">
-                  {selectedItem.type === 'image' ? (
-                    <img
+                  {selectedItem.type === "image" ? (
+                    <GalleryImage
                       src={selectedItem.url}
                       alt={selectedItem.title}
                       className="absolute inset-0 w-full h-full object-contain"
@@ -492,26 +674,32 @@ const GalleryPage = () => {
                     />
                   )}
                 </div>
-                
-                <div 
+
+                <div
                   className="p-4 bg-gray-900 text-white relative"
                   onMouseEnter={() => setShowThumbnails(true)}
                   onMouseLeave={() => setShowThumbnails(false)}
                 >
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="text-lg font-medium">{selectedItem.title}</h3>
-                      <p className="text-gray-400 text-sm">{selectedItem.date}</p>
+                      <h3 className="text-lg font-medium">
+                        {selectedItem.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        {selectedItem.date}
+                      </p>
                       {selectedItem.description && (
-                        <p className="text-gray-300 mt-2 text-sm">{selectedItem.description}</p>
+                        <p className="text-gray-300 mt-2 text-sm">
+                          {selectedItem.description}
+                        </p>
                       )}
                     </div>
                     <div className="flex space-x-3">
-                      <button 
+                      <button
                         className="hover:text-emerald-400"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          handleDownload(selectedItem.url, selectedItem.title)
+                          e.stopPropagation();
+                          handleDownload(selectedItem.url, selectedItem.title);
                         }}
                       >
                         <Download size={20} />
@@ -519,16 +707,16 @@ const GalleryPage = () => {
                       <button className="hover:text-emerald-400">
                         <Share2 size={20} />
                       </button>
-                      <button 
-                        className={`${selectedItem.liked ? 'text-red-500' : 'hover:text-red-500'}`}
+                      <button
+                        className={`${selectedItem.liked ? "text-red-500" : "hover:text-red-500"}`}
                         onClick={(e) => {
-                          e.stopPropagation()
-                          toggleLike(selectedItem.id)
+                          e.stopPropagation();
+                          toggleLike(selectedItem.id);
                         }}
                       >
-                        <Heart 
-                          size={20} 
-                          fill={selectedItem.liked ? 'currentColor' : 'none'} 
+                        <Heart
+                          size={20}
+                          fill={selectedItem.liked ? "currentColor" : "none"}
                         />
                       </button>
                     </div>
@@ -536,10 +724,10 @@ const GalleryPage = () => {
 
                   {/* Thumbnail previews - only shown when hovering bottom area */}
                   <AnimatePresence>
-                    {(showThumbnails && filteredItems.length > 1) && (
+                    {showThumbnails && filteredItems.length > 1 && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.2 }}
                         className="absolute left-0 right-0 bottom-full pb-2 bg-gradient-to-t from-black/90 to-transparent"
@@ -550,18 +738,18 @@ const GalleryPage = () => {
                               key={item.id}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden cursor-pointer relative transition-all duration-200 ${selectedItem.id === item.id ? 'ring-2 ring-emerald-500 transform scale-105' : 'opacity-70 hover:opacity-100'}`}
+                              className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden cursor-pointer relative transition-all duration-200 ${selectedItem.id === item.id ? "ring-2 ring-emerald-500 transform scale-105" : "opacity-70 hover:opacity-100"}`}
                               onClick={(e) => {
-                                e.stopPropagation()
-                                setSelectedItem(item)
+                                e.stopPropagation();
+                                setSelectedItem(item);
                               }}
                             >
-                              <img
+                              <GalleryImage
                                 src={item.url}
                                 alt={item.title}
                                 className="w-full h-full object-cover"
                               />
-                              {item.type === 'video' && (
+                              {item.type === "video" && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -592,7 +780,8 @@ const GalleryPage = () => {
         )}
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default GalleryPage
+export default GalleryPage;
+
