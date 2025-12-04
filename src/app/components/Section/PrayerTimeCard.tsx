@@ -1,11 +1,11 @@
+import React, { useEffect, useState } from "react";
 import { Bell, Volume2, MapPin, Info } from "lucide-react";
-import { useEffect, useState } from "react";
 
 interface PrayerTimeCardProps {
   nextPrayer: {
     name: string;
     time: string; // format: "05:12"
-    icon: JSX.Element;
+    icon: React.ReactNode;
   };
   currentTime: Date;
 }

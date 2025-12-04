@@ -38,10 +38,12 @@ const BACKGROUNDS = {
   rain: "from-blue-800 via-blue-900 to-black",
   fog: "from-gray-500 via-gray-600 to-gray-800",
   storm: "from-gray-800 via-black to-black",
-};
+} as const;
+
+type WeatherCondition = keyof typeof BACKGROUNDS;
 
 // ICON MAP (Apple-like icons)
-const ICONS = {
+const ICONS: Record<WeatherCondition, React.ReactNode> = {
   sunny: <Sun className="w-20 h-20 text-yellow-300" />,
   cloudy: <Cloud className="w-20 h-20 text-gray-100" />,
   rain: <CloudRain className="w-20 h-20 text-blue-200" />,
@@ -50,7 +52,7 @@ const ICONS = {
 };
 
 export default function WeatherPage() {
-  const [weather, setWeather] = useState("sunny");
+  const [weather, setWeather] = useState<WeatherCondition>("sunny");
   const [temp, setTemp] = useState(34);
   const [city, setCity] = useState("Vancouver");
 

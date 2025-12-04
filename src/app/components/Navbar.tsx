@@ -40,7 +40,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState({
     jadwal: false,
-    lainnya: false
+    lainnya: false,
+    user: false
   })
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -57,7 +58,7 @@ const Navbar = () => {
     }
   }, [])
 
-  const toggleDropdown = (name: 'jadwal' | 'lainnya') => {
+  const toggleDropdown = (name: 'jadwal' | 'lainnya' | 'user') => {
     setDropdownOpen(prev => ({
       ...prev,
       [name]: !prev[name]

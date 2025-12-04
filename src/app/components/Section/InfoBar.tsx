@@ -1,3 +1,4 @@
+import React from "react";
 import { Clock, CalendarDays, Landmark } from "lucide-react";
 
 interface InfoBarProps {
@@ -9,7 +10,7 @@ interface InfoBarProps {
   weather: {
     temp: number;
     condition: string;
-    icon: JSX.Element;
+    icon: React.ReactNode;
   };
 }
 
