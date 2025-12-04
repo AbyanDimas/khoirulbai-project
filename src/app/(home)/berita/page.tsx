@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Clock, 
-  Bookmark, 
-  Share2, 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Clock,
+  Bookmark,
+  Share2,
   MoreHorizontal,
   Search,
   ChevronDown,
@@ -26,10 +26,10 @@ import {
   Check,
   ArrowLeft,
   BookText,
-  X
-} from 'lucide-react'
-import Image from 'next/image'
-import Head from 'next/head'
+  X,
+} from "lucide-react";
+import Image from "next/image";
+import Head from "next/head";
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -40,30 +40,30 @@ import {
   TwitterIcon,
   WhatsappIcon,
   TelegramIcon,
-  EmailIcon
-} from 'react-share'
+  EmailIcon,
+} from "react-share";
 
 type BeritaItem = {
-  id: string
-  title: string
-  content: string
-  category: string
-  createdAt: string
-  image?: string
-  isTrending?: boolean
-  isFeatured?: boolean
-  slug: string
-}
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  createdAt: string;
+  image?: string;
+  isTrending?: boolean;
+  isFeatured?: boolean;
+  slug: string;
+};
 
 const categories = [
-  { name: 'Semua', icon: <Newspaper size={16} /> },
-  { name: 'Trending', icon: <TrendingUp size={16} /> },
-  { name: 'Favorit', icon: <Star size={16} /> },
-  { name: 'Lokal', icon: <MapPin size={16} /> },
-  { name: 'Video', icon: <Film size={16} /> },
-  { name: 'Audio', icon: <Music size={16} /> },
-  { name: 'Artikel', icon: <BookOpen size={16} /> }
-]
+  { name: "Semua", icon: <Newspaper size={16} /> },
+  { name: "Trending", icon: <TrendingUp size={16} /> },
+  { name: "Favorit", icon: <Star size={16} /> },
+  { name: "Lokal", icon: <MapPin size={16} /> },
+  { name: "Video", icon: <Film size={16} /> },
+  { name: "Audio", icon: <Music size={16} /> },
+  { name: "Artikel", icon: <BookOpen size={16} /> },
+];
 
 const ITEMS_PER_PAGE = 21;
 
@@ -76,15 +76,28 @@ const GoogleLikeLoading = () => {
         <Newspaper className="absolute inset-4 w-12 h-12 text-emerald-600 dark:text-emerald-400 animate-bounce" />
       </div>
       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
-        <div className="bg-emerald-600 h-2.5 rounded-full animate-progress" style={{ width: '70%' }}></div>
+        <div
+          className="bg-emerald-600 h-2.5 rounded-full animate-progress"
+          style={{ width: "70%" }}
+        ></div>
       </div>
-      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Memuat Berita</h3>
-      <p className="text-gray-500 dark:text-gray-400 text-sm">Sedang mengambil informasi terbaru...</p>
+      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
+        Memuat Berita
+      </h3>
+      <p className="text-gray-500 dark:text-gray-400 text-sm">
+        Sedang mengambil informasi terbaru...
+      </p>
     </div>
   );
 };
 
-const GoogleLikeError = ({ error, onRetry }: { error: string, onRetry: () => void }) => {
+const GoogleLikeError = ({
+  error,
+  onRetry,
+}: {
+  error: string;
+  onRetry: () => void;
+}) => {
   return (
     <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
       <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
@@ -93,14 +106,29 @@ const GoogleLikeError = ({ error, onRetry }: { error: string, onRetry: () => voi
           <div className="absolute inset-0 rounded-full bg-red-200 dark:bg-red-800/30 animate-ping opacity-75"></div>
         </div>
       </div>
-      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Gagal Memuat Berita</h3>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">{error}</p>
+      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
+        Gagal Memuat Berita
+      </h3>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">
+        {error}
+      </p>
       <button
         onClick={onRetry}
         className="px-6 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors flex items-center shadow-sm"
       >
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
         Coba Lagi
       </button>
@@ -108,139 +136,280 @@ const GoogleLikeError = ({ error, onRetry }: { error: string, onRetry: () => voi
   );
 };
 
-const EmptyState = ({ title, description }: { title: string, description: string }) => {
+const EmptyState = ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-sm">
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
         <Newspaper className="h-6 w-6 text-gray-500 dark:text-gray-400" />
       </div>
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">{title}</h3>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+        {title}
+      </h3>
       <p className="text-gray-500 dark:text-gray-400">{description}</p>
     </div>
   );
 };
 
 const Berita = () => {
-  const [activeCategory, setActiveCategory] = useState('Semua')
-  const [berita, setBerita] = useState<BeritaItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [showShareMenu, setShowShareMenu] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [activeCategory, setActiveCategory] = useState("Semua");
+  const [berita, setBerita] = useState<BeritaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showShareMenu, setShowShareMenu] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchBerita = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*`)
+        console.log(
+          "Fetching data from:",
+          `${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*`,
+        );
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*`,
+        );
+
         if (!response.ok) {
-          throw new Error('Gagal memuat berita. Silakan coba lagi nanti.')
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json()
-        
+
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        // Format data berdasarkan struktur API yang diberikan
         const formattedBerita = data.data.map((item: any) => {
-          let imageUrl = null;
-          if (item.attributes.image?.data?.attributes?.url) {
-            if (item.attributes.image.data.attributes.url.startsWith('http')) {
-              imageUrl = item.attributes.image.data.attributes.url;
+          try {
+            const attributes = item.attributes || item;
+
+            // Parse konten jika berupa array/objek
+            let content = "";
+            if (Array.isArray(attributes.content)) {
+              content = attributes.content
+                .map((block: any) => {
+                  if (
+                    block.type === "paragraph" &&
+                    Array.isArray(block.children)
+                  ) {
+                    return block.children
+                      .map((child: any) => child.text)
+                      .join(" ");
+                  }
+                  return "";
+                })
+                .join(" ");
+            } else if (typeof attributes.content === "string") {
+              content = attributes.content;
             } else {
-              imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${item.attributes.image.data.attributes.url}`;
+              content = JSON.stringify(attributes.content || "");
             }
-          }
 
-          return {
-            id: item.id.toString(),
-            title: item.attributes.name,
-            content: item.attributes.content,
-            category: item.attributes.category || 'Berita',
-            createdAt: new Date(item.attributes.createdAt).toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            }),
-            slug: item.attributes.slug,
-            image: imageUrl,
-            isTrending: item.attributes.isTrending || Math.random() > 0.7,
-            isFeatured: item.attributes.isFeatured || Math.random() > 0.8
+            // Handle image - FIXED: Perbaikan utama di sini!
+            const imageUrl = getImageUrl(attributes.image); // FIX DI SINI
+            // let imageUrl = null;
+
+            // ==== FUNCTION URL IMAGE (gunakan dari ENV baru) ====
+            function getImageUrl(img: any) {
+              const BASE = process.env.NEXT_PUBLIC_IMAGE_URL; // contoh: http://10.2.2.160:1337
+
+              if (!img) return null;
+
+              if (img.url) {
+                return img.url.startsWith("http")
+                  ? img.url
+                  : `${BASE}${img.url}`;
+              }
+
+              if (img.formats?.large?.url)
+                return `${BASE}${img.formats.large.url}`;
+              if (img.formats?.medium?.url)
+                return `${BASE}${img.formats.medium.url}`;
+              if (img.formats?.small?.url)
+                return `${BASE}${img.formats.small.url}`;
+              if (img.formats?.thumbnail?.url)
+                return `${BASE}${img.formats.thumbnail.url}`;
+
+              return null;
+            }
+
+            // Buat objek berita
+            const beritaItem: BeritaItem = {
+              id: item.id?.toString() || Math.random().toString(),
+              title:
+                attributes.judul_berita ||
+                attributes.title ||
+                attributes.name ||
+                "Tanpa Judul",
+              content: content,
+              category: attributes.category || "kegiatan",
+              createdAt: new Date(
+                attributes.createdAt || attributes.publishedAt || new Date(),
+              ).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }),
+              slug: attributes.slug || item.id?.toString() || "no-slug",
+              image: imageUrl,
+              isTrending: attributes.isTrending || Math.random() > 0.7,
+              isFeatured: attributes.isFeatured || Math.random() > 0.8,
+            };
+
+            console.log("Processed item:", beritaItem);
+            return beritaItem;
+          } catch (err) {
+            console.error("Error processing item:", err, item);
+            // Return fallback item jika terjadi error
+            return {
+              id: item.id?.toString() || Math.random().toString(),
+              title: "Error loading title",
+              content: "Error loading content",
+              category: "Error",
+              createdAt: new Date().toLocaleDateString("id-ID"),
+              slug: "error",
+              image: null,
+              isTrending: false,
+              isFeatured: false,
+            };
           }
-        })
-        
-        setBerita(formattedBerita)
-        setTotalPages(Math.ceil(formattedBerita.length / ITEMS_PER_PAGE))
+        });
+
+        // Filter out any null items
+        const validBerita = formattedBerita.filter(
+          (item: BeritaItem) => item && item.title !== "Error loading title",
+        );
+
+        console.log("Valid berita:", validBerita);
+        setBerita(validBerita);
+        setTotalPages(Math.ceil(validBerita.length / ITEMS_PER_PAGE));
       } catch (error) {
-        console.error('Error fetching news:', error)
-        setError(error instanceof Error ? error.message : 'Terjadi kesalahan tidak diketahui')
+        console.error("Error fetching news:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan tidak diketahui. Silakan cek koneksi internet atau hubungi administrator.",
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchBerita()
-  }, [])
+    fetchBerita();
+  }, []);
 
-  const filteredBerita = activeCategory === 'Semua' 
-    ? berita 
-    : activeCategory === 'Trending'
-      ? berita.filter(item => item.isTrending)
-      : activeCategory === 'Favorit'
-        ? berita.filter(item => item.isFeatured)
-        : berita.filter(item => item.category === activeCategory)
+  const filteredBerita =
+    activeCategory === "Semua"
+      ? berita
+      : activeCategory === "Trending"
+        ? berita.filter((item) => item.isTrending)
+        : activeCategory === "Favorit"
+          ? berita.filter((item) => item.isFeatured)
+          : berita.filter((item) => item.category === activeCategory);
 
-  const searchedBerita = searchQuery 
-    ? filteredBerita.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.content.toLowerCase().includes(searchQuery.toLowerCase()))
-    : filteredBerita
+  const searchedBerita = searchQuery
+    ? filteredBerita.filter(
+        (item) =>
+          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.content.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : filteredBerita;
 
   const paginatedBerita = searchedBerita.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  )
+    currentPage * ITEMS_PER_PAGE,
+  );
 
-  const featuredBerita = berita.filter(item => item.isFeatured)
-  const trendingBerita = berita.filter(item => item.isTrending)
+  const featuredBerita = berita.filter((item) => item.isFeatured);
+  const trendingBerita = berita.filter((item) => item.isTrending);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  const toggleShareMenu = (id: string) => {
-    setShowShareMenu(showShareMenu === id ? null : id)
-    setCopied(false)
-  }
+  const toggleShareMenu = (slug: string) => {
+    setShowShareMenu(showShareMenu === slug ? null : slug);
+    setCopied(false);
+  };
 
   const getShareUrl = (slug: string) => {
-    return `${window.location.origin}/berita/${slug}`
-  }
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}/berita/${slug}`;
+    }
+    return "";
+  };
 
   const copyToClipboard = (slug: string) => {
-    navigator.clipboard.writeText(getShareUrl(slug))
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    navigator.clipboard.writeText(getShareUrl(slug));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Fungsi untuk menangani error gambar
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
+  ) => {
+    const target = e.target as HTMLImageElement;
+    console.log("Image error:", target.src);
+    target.onerror = null;
+    // Fallback ke gambar placeholder
+    target.src =
+      "https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+  };
+
+  // Komponen gambar dengan fallback
+  const NewsImage = ({ item }: { item: BeritaItem }) => {
+    if (!item.image) {
+      return (
+        <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+          <ImageIcon size={32} className="text-gray-400" />
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {/* Gunakan img tag biasa untuk debugging */}
+        <img
+          src={item.image}
+          alt={item.title}
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={handleImageError}
+          crossOrigin="anonymous"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 z-10" />
+      </>
+    );
+  };
 
   const renderPagination = () => {
-    if (searchedBerita.length <= ITEMS_PER_PAGE) return null
+    if (searchedBerita.length <= ITEMS_PER_PAGE) return null;
 
-    const pages = []
-    const maxVisiblePages = 5
-    let startPage = 1
-    let endPage = totalPages
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = 1;
+    let endPage = totalPages;
 
     if (totalPages > maxVisiblePages) {
-      const half = Math.floor(maxVisiblePages / 2)
+      const half = Math.floor(maxVisiblePages / 2);
       if (currentPage <= half + 1) {
-        endPage = maxVisiblePages
+        endPage = maxVisiblePages;
       } else if (currentPage >= totalPages - half) {
-        startPage = totalPages - maxVisiblePages + 1
+        startPage = totalPages - maxVisiblePages + 1;
       } else {
-        startPage = currentPage - half
-        endPage = currentPage + half
+        startPage = currentPage - half;
+        endPage = currentPage + half;
       }
     }
 
@@ -249,13 +418,17 @@ const Berita = () => {
         <button
           key={1}
           onClick={() => handlePageChange(1)}
-          className={`px-3 py-1 rounded ${1 === currentPage ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+          className={`px-3 py-1 rounded ${1 === currentPage ? "bg-emerald-600 text-white" : "bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"}`}
         >
           1
-        </button>
-      )
+        </button>,
+      );
       if (startPage > 2) {
-        pages.push(<span key="start-ellipsis" className="px-2">...</span>)
+        pages.push(
+          <span key="start-ellipsis" className="px-2">
+            ...
+          </span>,
+        );
       }
     }
 
@@ -264,26 +437,30 @@ const Berita = () => {
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`px-3 py-1 rounded ${i === currentPage ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+          className={`px-3 py-1 rounded ${i === currentPage ? "bg-emerald-600 text-white" : "bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"}`}
         >
           {i}
-        </button>
-      )
+        </button>,
+      );
     }
 
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        pages.push(<span key="end-ellipsis" className="px-2">...</span>)
+        pages.push(
+          <span key="end-ellipsis" className="px-2">
+            ...
+          </span>,
+        );
       }
       pages.push(
         <button
           key={totalPages}
           onClick={() => handlePageChange(totalPages)}
-          className={`px-3 py-1 rounded ${totalPages === currentPage ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+          className={`px-3 py-1 rounded ${totalPages === currentPage ? "bg-emerald-600 text-white" : "bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"}`}
         >
           {totalPages}
-        </button>
-      )
+        </button>,
+      );
     }
 
     return (
@@ -302,7 +479,7 @@ const Berita = () => {
         >
           <ChevronLeft size={16} />
         </button>
-        
+
         {pages}
 
         <button
@@ -320,27 +497,42 @@ const Berita = () => {
           <ChevronsRight size={16} />
         </button>
       </div>
-    )
-  }
+    );
+  };
 
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Head>
           <title>Berita & Artikel - Masjid Khoirul Ba'i STM ADB</title>
-          <meta name="description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
-          <meta name="keywords" content="berita masjid, artikel islami, kegiatan masjid, STM ADB" />
-          <meta property="og:title" content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB" />
-          <meta property="og:description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+          <meta
+            name="description"
+            content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB"
+          />
+          <meta
+            name="keywords"
+            content="berita masjid, artikel islami, kegiatan masjid, STM ADB"
+          />
+          <meta
+            property="og:title"
+            content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB"
+          />
+          <meta
+            property="og:description"
+            content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB"
+          />
           <meta property="og:type" content="website" />
-          <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+          <meta
+            property="og:url"
+            content={typeof window !== "undefined" ? window.location.href : ""}
+          />
         </Head>
-        
+
         <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
           <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
           <div className="container mx-auto px-4 relative">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
             >
               <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
@@ -361,10 +553,13 @@ const Berita = () => {
           </div>
         </section>
         <section className="container mx-auto px-4 py-12">
-          <GoogleLikeError error={error} onRetry={() => window.location.reload()} />
+          <GoogleLikeError
+            error={error}
+            onRetry={() => window.location.reload()}
+          />
         </section>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -372,19 +567,34 @@ const Berita = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Head>
           <title>Berita & Artikel - Masjid Khoirul Ba'i STM ADB</title>
-          <meta name="description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
-          <meta name="keywords" content="berita masjid, artikel islami, kegiatan masjid, STM ADB" />
-          <meta property="og:title" content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB" />
-          <meta property="og:description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+          <meta
+            name="description"
+            content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB"
+          />
+          <meta
+            name="keywords"
+            content="berita masjid, artikel islami, kegiatan masjid, STM ADB"
+          />
+          <meta
+            property="og:title"
+            content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB"
+          />
+          <meta
+            property="og:description"
+            content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB"
+          />
           <meta property="og:type" content="website" />
-          <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+          <meta
+            property="og:url"
+            content={typeof window !== "undefined" ? window.location.href : ""}
+          />
         </Head>
-        
+
         <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
           <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
           <div className="container mx-auto px-4 relative">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
             >
               <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
@@ -408,27 +618,42 @@ const Berita = () => {
           <GoogleLikeLoading />
         </section>
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Head>
         <title>Berita & Artikel - Masjid Khoirul Ba'i STM ADB</title>
-        <meta name="description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
-        <meta name="keywords" content="berita masjid, artikel islami, kegiatan masjid, STM ADB" />
-        <meta property="og:title" content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB" />
-        <meta property="og:description" content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB" />
+        <meta
+          name="description"
+          content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB"
+        />
+        <meta
+          name="keywords"
+          content="berita masjid, artikel islami, kegiatan masjid, STM ADB"
+        />
+        <meta
+          property="og:title"
+          content="Berita & Artikel - Masjid Khoirul Ba'i STM ADB"
+        />
+        <meta
+          property="og:description"
+          content="Informasi terbaru seputar kegiatan Masjid Khoirul Ba'i STM ADB"
+        />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+        <meta
+          property="og:url"
+          content={typeof window !== "undefined" ? window.location.href : ""}
+        />
       </Head>
 
       {/* Header Section */}
       <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
         <div className="container mx-auto px-4 relative">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
           >
             <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
@@ -453,7 +678,7 @@ const Berita = () => {
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
             className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 overflow-hidden"
@@ -463,14 +688,14 @@ const Berita = () => {
                 <button
                   key={category.name}
                   onClick={() => {
-                    setActiveCategory(category.name)
-                    setMobileMenuOpen(false)
-                    setCurrentPage(1)
+                    setActiveCategory(category.name);
+                    setMobileMenuOpen(false);
+                    setCurrentPage(1);
                   }}
                   className={`flex items-center justify-center px-3 py-2 rounded-lg text-sm ${
                     activeCategory === category.name
-                      ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? "bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}
                 >
                   <span className="mr-2">{category.icon}</span>
@@ -488,13 +713,13 @@ const Berita = () => {
             <button
               key={category.name}
               onClick={() => {
-                setActiveCategory(category.name)
-                setCurrentPage(1)
+                setActiveCategory(category.name);
+                setCurrentPage(1);
               }}
               className={`flex items-center px-4 py-2 rounded-full text-sm whitespace-nowrap ${
                 activeCategory === category.name
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
               }`}
             >
               <span className="mr-2">{category.icon}</span>
@@ -503,9 +728,11 @@ const Berita = () => {
           ))}
         </div>
 
-        {activeCategory === 'Semua' && (
+        {activeCategory === "Semua" && (
           <div className="hidden md:block mb-8">
-            <h2 className="text-xl font-bold mb-4 dark:text-white">Sorotan Utama</h2>
+            <h2 className="text-xl font-bold mb-4 dark:text-white">
+              Sorotan Utama
+            </h2>
             {featuredBerita.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {featuredBerita.map((item) => (
@@ -518,31 +745,14 @@ const Berita = () => {
                   >
                     <Link href={`/berita/${item.slug}`}>
                       <div className="relative h-48">
-                        {item.image ? (
-                          <>
-                            <Image
-                              src={item.image}
-                              alt={item.title}
-                              fill
-                              className="object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.onerror = null;
-                                target.src = '/placeholder-image.jpg';
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 z-10" />
-                          </>
-                        ) : (
-                          <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                            <ImageIcon size={32} className="text-gray-400" />
-                          </div>
-                        )}
+                        <NewsImage item={item} />
                         <div className="absolute bottom-4 left-4 z-20">
                           <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
                             {item.category}
                           </span>
-                          <h3 className="text-white text-xl font-bold mt-2">{item.title}</h3>
+                          <h3 className="text-white text-xl font-bold mt-2">
+                            {item.title}
+                          </h3>
                           <div className="flex items-center text-white/80 text-sm mt-1">
                             <Clock size={14} className="mr-1" />
                             {item.createdAt}
@@ -552,10 +762,10 @@ const Berita = () => {
                     </Link>
                     <div className="p-4">
                       <p className="text-gray-700 dark:text-gray-300 line-clamp-3">
-                        {item.content.substring(0, 150)}...
+                        {item.content?.toString()?.substring(0, 150)}...
                       </p>
                       <div className="flex justify-between items-center mt-4">
-                        <Link 
+                        <Link
                           href={`/berita/${item.slug}`}
                           className="text-emerald-600 dark:text-emerald-400 hover:underline text-sm font-medium"
                         >
@@ -565,10 +775,15 @@ const Berita = () => {
                           <div className="relative">
                             <button
                               className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-                              onClick={() => toggleShareMenu(item.id)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                toggleShareMenu(item.slug);
+                              }}
                             >
                               <Share2 size={15} />
-                              <span className="text-sm font-medium">Bagikan</span>
+                              <span className="text-sm font-medium">
+                                Bagikan
+                              </span>
                             </button>
                           </div>
                         </div>
@@ -578,19 +793,24 @@ const Berita = () => {
                 ))}
               </div>
             ) : (
-              <EmptyState 
-                title="Tidak Ada Sorotan Utama" 
-                description="Belum ada berita yang ditandai sebagai sorotan utama saat ini." 
+              <EmptyState
+                title="Tidak Ada Sorotan Utama"
+                description="Belum ada berita yang ditandai sebagai sorotan utama saat ini."
               />
             )}
           </div>
         )}
 
-        {(activeCategory === 'Semua' || activeCategory === 'Trending') && (
+        {(activeCategory === "Semua" || activeCategory === "Trending") && (
           <div className="mb-8">
             <h2 className="text-xl font-bold mb-4 dark:text-white flex items-center">
-              <TrendingUp size={20} className="mr-2 text-emerald-600 dark:text-emerald-400" />
-              {activeCategory === 'Semua' ? 'Trending Sekarang' : 'Berita Trending'}
+              <TrendingUp
+                size={20}
+                className="mr-2 text-emerald-600 dark:text-emerald-400"
+              />
+              {activeCategory === "Semua"
+                ? "Trending Sekarang"
+                : "Berita Trending"}
             </h2>
             {trendingBerita.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -604,31 +824,13 @@ const Berita = () => {
                   >
                     <Link href={`/berita/${item.slug}`}>
                       <div className="relative h-40">
-                        {item.image ? (
-                          <>
-                            <Image
-                              src={item.image}
-                              alt={item.title}
-                              fill
-                              className="object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.onerror = null;
-                                target.src = '/placeholder-image.jpg';
-                              }}
-                            />
-                            <div className="absolute top-2 right-2 z-10">
-                              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
-                                <TrendingUp size={12} className="mr-1" />
-                                Trending
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                            <ImageIcon size={32} className="text-gray-400" />
-                          </div>
-                        )}
+                        <NewsImage item={item} />
+                        <div className="absolute top-2 right-2 z-10">
+                          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
+                            <TrendingUp size={12} className="mr-1" />
+                            Trending
+                          </span>
+                        </div>
                       </div>
                     </Link>
                     <div className="p-4">
@@ -648,7 +850,10 @@ const Berita = () => {
                         <div className="relative">
                           <button
                             className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-                            onClick={() => toggleShareMenu(item.id)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              toggleShareMenu(item.slug);
+                            }}
                           >
                             <Share2 size={15} />
                             <span className="text-sm font-medium">Bagikan</span>
@@ -660,9 +865,9 @@ const Berita = () => {
                 ))}
               </div>
             ) : (
-              <EmptyState 
-                title="Tidak Ada Berita Trending" 
-                description="Belum ada berita yang sedang trending saat ini." 
+              <EmptyState
+                title="Tidak Ada Berita Trending"
+                description="Belum ada berita yang sedang trending saat ini."
               />
             )}
           </div>
@@ -670,9 +875,11 @@ const Berita = () => {
 
         <div>
           <h2 className="text-xl font-bold mb-4 dark:text-white">
-            {activeCategory === 'Semua' ? 'Berita Terbaru' : `Berita ${activeCategory}`}
+            {activeCategory === "Semua"
+              ? "Berita Terbaru"
+              : `Berita ${activeCategory}`}
           </h2>
-          
+
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, index) => (
@@ -710,30 +917,12 @@ const Berita = () => {
                         >
                           <Link href={`/berita/${item.slug}`}>
                             <div className="relative h-40">
-                              {item.image ? (
-                                <>
-                                  <Image
-                                    src={item.image}
-                                    alt={item.title}
-                                    fill
-                                    className="object-cover"
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.onerror = null;
-                                      target.src = '/placeholder-image.jpg';
-                                    }}
-                                  />
-                                  <div className="absolute top-2 left-2 z-10">
-                                    <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
-                                      {item.category}
-                                    </span>
-                                  </div>
-                                </>
-                              ) : (
-                                <div className="absolute inset-0 bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                                  <ImageIcon size={32} className="text-gray-400" />
-                                </div>
-                              )}
+                              <NewsImage item={item} />
+                              <div className="absolute top-2 left-2 z-10">
+                                <span className="bg-emerald-600 text-white text-xs px-2 py-1 rounded">
+                                  {item.category}
+                                </span>
+                              </div>
                             </div>
                           </Link>
                           <div className="p-4">
@@ -743,7 +932,7 @@ const Berita = () => {
                               </h3>
                             </Link>
                             <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
-                              {item.content.substring(0, 100)}...
+                              {item.content?.toString()?.substring(0, 100)}...
                             </p>
                             <div className="flex items-center justify-between mt-4">
                               <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
@@ -754,10 +943,15 @@ const Berita = () => {
                                 <div className="relative">
                                   <button
                                     className="px-3 py-1.5 bg-emerald-500 rounded-full shadow-sm flex items-center space-x-1.5 text-white hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition-all duration-200"
-                                    onClick={() => toggleShareMenu(item.id)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      toggleShareMenu(item.slug);
+                                    }}
                                   >
                                     <Share2 size={15} />
-                                    <span className="text-sm font-medium">Bagikan</span>
+                                    <span className="text-sm font-medium">
+                                      Bagikan
+                                    </span>
                                   </button>
                                 </div>
                               </div>
@@ -771,9 +965,9 @@ const Berita = () => {
                   {renderPagination()}
                 </>
               ) : (
-                <EmptyState 
-                  title={`Tidak Ada Berita ${activeCategory === 'Semua' ? '' : activeCategory}`} 
-                  description={`Maaf, belum ada berita yang tersedia dalam kategori ${activeCategory === 'Semua' ? 'ini' : activeCategory} saat ini.`} 
+                <EmptyState
+                  title={`Tidak Ada Berita ${activeCategory === "Semua" ? "" : activeCategory}`}
+                  description={`Maaf, belum ada berita yang tersedia dalam kategori ${activeCategory === "Semua" ? "ini" : activeCategory} saat ini.`}
                 />
               )}
             </>
@@ -800,113 +994,146 @@ const Berita = () => {
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold dark:text-white">Bagikan</h3>
-                <button 
+                <button
                   onClick={() => setShowShareMenu(null)}
                   className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
 
-              {berita.filter(item => item.id === showShareMenu).map(item => (
-                <div key={item.id}>
-                  <div className="flex items-center space-x-4 mb-6">
-                    {item.image ? (
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden">
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          fill
-                          className="object-cover"
-                        />
+              {berita
+                .filter((item) => item.slug === showShareMenu)
+                .map((item) => (
+                  <div key={item.id}>
+                    <div className="flex items-center space-x-4 mb-6">
+                      {item.image ? (
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="object-cover w-full h-full"
+                            onError={handleImageError}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                          <ImageIcon size={24} className="text-gray-400" />
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-medium dark:text-white line-clamp-2">
+                          {item.title}
+                        </h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {item.category}
+                        </p>
                       </div>
-                    ) : (
-                      <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                        <ImageIcon size={24} className="text-gray-400" />
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="font-medium dark:text-white line-clamp-2">{item.title}</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{item.category}</p>
                     </div>
-                  </div>
 
-                  <div className="mb-6">
-                    <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                      <div className="flex-1 truncate text-sm dark:text-gray-200">
-                        {getShareUrl(item.slug)}
+                    <div className="mb-6">
+                      <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                        <div className="flex-1 truncate text-sm dark:text-gray-200">
+                          {getShareUrl(item.slug)}
+                        </div>
+                        <button
+                          onClick={() => copyToClipboard(item.slug)}
+                          className="ml-2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+                          title="Salin link"
+                        >
+                          {copied ? (
+                            <Check
+                              size={18}
+                              className="text-emerald-600 dark:text-emerald-400"
+                            />
+                          ) : (
+                            <Copy
+                              size={18}
+                              className="text-gray-500 dark:text-gray-400"
+                            />
+                          )}
+                        </button>
                       </div>
-                      <button 
-                        onClick={() => copyToClipboard(item.slug)}
-                        className="ml-2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
-                        title="Salin link"
+                    </div>
+
+                    <div className="grid grid-cols-5 gap-4">
+                      <FacebookShareButton
+                        url={getShareUrl(item.slug)}
+                        title={item.title}
+                        className="flex flex-col items-center"
                       >
-                        {copied ? (
-                          <Check size={18} className="text-emerald-600 dark:text-emerald-400" />
-                        ) : (
-                          <Copy size={18} className="text-gray-500 dark:text-gray-400" />
-                        )}
-                      </button>
+                        <FacebookIcon size={48} round />
+                        <span className="text-xs mt-2 dark:text-gray-300">
+                          Facebook
+                        </span>
+                      </FacebookShareButton>
+
+                      <TwitterShareButton
+                        url={getShareUrl(item.slug)}
+                        title={item.title}
+                        className="flex flex-col items-center"
+                      >
+                        <TwitterIcon size={48} round />
+                        <span className="text-xs mt-2 dark:text-gray-300">
+                          Twitter
+                        </span>
+                      </TwitterShareButton>
+
+                      <WhatsappShareButton
+                        url={getShareUrl(item.slug)}
+                        title={item.title}
+                        className="flex flex-col items-center"
+                      >
+                        <WhatsappIcon size={48} round />
+                        <span className="text-xs mt-2 dark:text-gray-300">
+                          WhatsApp
+                        </span>
+                      </WhatsappShareButton>
+
+                      <TelegramShareButton
+                        url={getShareUrl(item.slug)}
+                        title={item.title}
+                        className="flex flex-col items-center"
+                      >
+                        <TelegramIcon size={48} round />
+                        <span className="text-xs mt-2 dark:text-gray-300">
+                          Telegram
+                        </span>
+                      </TelegramShareButton>
+
+                      <EmailShareButton
+                        url={getShareUrl(item.slug)}
+                        subject={item.title}
+                        body={`Lihat berita ini: ${item.title}`}
+                        className="flex flex-col items-center"
+                      >
+                        <EmailIcon size={48} round />
+                        <span className="text-xs mt-2 dark:text-gray-300">
+                          Email
+                        </span>
+                      </EmailShareButton>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-5 gap-4">
-                    <FacebookShareButton 
-                      url={getShareUrl(item.slug)} 
-                      quote={item.title}
-                      className="flex flex-col items-center"
-                    >
-                      <FacebookIcon size={48} round />
-                      <span className="text-xs mt-2 dark:text-gray-300">Facebook</span>
-                    </FacebookShareButton>
-                    
-                    <TwitterShareButton 
-                      url={getShareUrl(item.slug)} 
-                      title={item.title}
-                      className="flex flex-col items-center"
-                    >
-                      <TwitterIcon size={48} round />
-                      <span className="text-xs mt-2 dark:text-gray-300">Twitter</span>
-                    </TwitterShareButton>
-                    
-                    <WhatsappShareButton 
-                      url={getShareUrl(item.slug)} 
-                      title={item.title}
-                      className="flex flex-col items-center"
-                    >
-                      <WhatsappIcon size={48} round />
-                      <span className="text-xs mt-2 dark:text-gray-300">WhatsApp</span>
-                    </WhatsappShareButton>
-                    
-                    <TelegramShareButton 
-                      url={getShareUrl(item.slug)} 
-                      title={item.title}
-                      className="flex flex-col items-center"
-                    >
-                      <TelegramIcon size={48} round />
-                      <span className="text-xs mt-2 dark:text-gray-300">Telegram</span>
-                    </TelegramShareButton>
-                    
-                    <EmailShareButton 
-                      url={getShareUrl(item.slug)} 
-                      subject={item.title}
-                      body={`Lihat berita ini: ${item.title}`}
-                      className="flex flex-col items-center"
-                    >
-                      <EmailIcon size={48} round />
-                      <span className="text-xs mt-2 dark:text-gray-300">Email</span>
-                    </EmailShareButton>
-                  </div>
-                </div>
-              ))}
+                ))}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default Berita
+export default Berita;

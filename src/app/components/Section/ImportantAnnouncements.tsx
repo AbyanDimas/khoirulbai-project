@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { AlertCircle, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { Announcement } from '@/app/types';
+import { AlertCircle, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Announcement } from "@/app/types";
 
 export const ImportantAnnouncements = () => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -16,26 +16,54 @@ export const ImportantAnnouncements = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/pengunguman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=5`
+          `${process.env.NEXT_PUBLIC_API_URL}/pengumuman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=5`,
         );
-        
+
         if (!response.ok) {
-          throw new Error('Gagal memuat pengumuman penting');
+          throw new Error("Gagal memuat pengumuman penting");
         }
 
         const data = await response.json();
 
+        const convertStrapiBlocks = (blocks: any): string => {
+          if (!blocks) return "Tidak ada deskripsi";
+
+          // Jika sudah string
+          if (typeof blocks === "string") return blocks;
+
+          // Jika formatnya array block (Strapi Rich Text)
+          if (Array.isArray(blocks)) {
+            return blocks
+              .map((block) => {
+                if (Array.isArray(block.children)) {
+                  return block.children
+                    .map((child: any) => child.text || "")
+                    .join(" ");
+                }
+                return "";
+              })
+              .join("\n\n");
+          }
+
+          return "";
+        };
+
         const formattedAnnouncements = data.data.map((item: any) => ({
           id: item.id.toString(),
-          title: item.attributes.nama,
-          content: item.attributes.deskripsi || 'Tidak ada deskripsi',
-          important: true
+          title: item.nama,
+          // content: item.deskripsi || "Tidak ada deskripsi",
+          content: convertStrapiBlocks(item.deskripsi),
+          important: true,
         }));
 
         setAnnouncements(formattedAnnouncements);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Terjadi kesalahan tidak diketahui');
-        console.error('Error fetching important announcements:', err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Terjadi kesalahan tidak diketahui",
+        );
+        console.error("Error fetching important announcements:", err);
       } finally {
         setLoading(false);
       }
@@ -46,7 +74,7 @@ export const ImportantAnnouncements = () => {
 
   if (loading) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ y: 20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -73,7 +101,7 @@ export const ImportantAnnouncements = () => {
 
   if (error) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ y: 20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -88,12 +116,23 @@ export const ImportantAnnouncements = () => {
         <div className="border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-500 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-red-500 dark:text-red-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Gagal Memuat Pengumuman</h3>
+              <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                Gagal Memuat Pengumuman
+              </h3>
               <div className="mt-2 text-sm text-red-700 dark:text-red-300">
                 <p>Periksa Jaringan Anda Atau Coba Lagi Nanti</p>
               </div>
@@ -114,7 +153,7 @@ export const ImportantAnnouncements = () => {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ y: 20, opacity: 0 }}
       whileInView={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -125,7 +164,7 @@ export const ImportantAnnouncements = () => {
         <AlertCircle className="mr-2 text-amber-600 dark:text-amber-400" />
         Pengumuman Penting
       </h2>
-      
+
       {announcements.length === 0 ? (
         <div className="text-center py-4 text-gray-600 dark:text-gray-400">
           Tidak ada pengumuman penting saat ini
@@ -143,15 +182,19 @@ export const ImportantAnnouncements = () => {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-bold dark:text-white">{announcement.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{announcement.content}</p>
+                    <h3 className="font-bold dark:text-white">
+                      {announcement.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+                      {announcement.content}
+                    </p>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
-          <Link 
-            href="/pengumuman" 
+          <Link
+            href="/pengumuman"
             className="inline-flex items-center mt-4 text-amber-600 dark:text-amber-400 hover:underline text-sm"
           >
             Lihat semua pengumuman <ChevronRight className="ml-1 h-4 w-4" />
@@ -161,3 +204,4 @@ export const ImportantAnnouncements = () => {
     </motion.div>
   );
 };
+

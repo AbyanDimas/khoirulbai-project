@@ -1,10 +1,52 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { CalendarDays, Clock, MapPin, ChevronRight, Users, Info, X, Plus, ArrowLeft, Clipboard } from 'lucide-react';
-import Link from 'next/link';
-import { JSX, useEffect, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  CalendarDays,
+  Clock,
+  MapPin,
+  ChevronRight,
+  Info,
+  X,
+  Plus,
+  ArrowLeft,
+} from "lucide-react";
+import Link from "next/link";
+import React, { JSX, useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+
+/**
+ * -------------------------
+ * TYPES & CATEGORY DEFINITIONS
+ * -------------------------
+ */
+const categoryColors = {
+  sholat: "bg-emerald-600 dark:bg-emerald-300",
+  pengajian: "bg-emerald-600 dark:bg-emerald-300",
+  event: "bg-emerald-600 dark:bg-emerald-300",
+  belajar: "bg-emerald-600 dark:bg-emerald-300",
+  ramadhan: "bg-emerald-600 dark:bg-emerald-300",
+} as const;
+
+const categoryIcons = {
+  sholat: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+  pengajian: (
+    <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
+  ),
+  event: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+  belajar: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+  ramadhan: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
+} as const;
+
+const categoryBackgrounds = {
+  sholat: "bg-emerald-100 dark:bg-emerald-900",
+  pengajian: "bg-emerald-100 dark:bg-emerald-900",
+  event: "bg-emerald-100 dark:bg-emerald-900",
+  belajar: "bg-emerald-100 dark:bg-emerald-900",
+  ramadhan: "bg-emerald-100 dark:bg-emerald-900",
+} as const;
+
+type CategoryType = keyof typeof categoryColors;
 
 type AgendaItem = {
   id: string;
@@ -13,7 +55,7 @@ type AgendaItem = {
   endDate: string;
   description: string;
   location: string;
-  category: string;
+  category: CategoryType;
   color: string;
   icon: JSX.Element;
   startTime: string;
@@ -22,74 +64,110 @@ type AgendaItem = {
   rawEndDate?: string;
 };
 
-const categoryColors = {
-  sholat: "bg-emerald-600 dark:bg-emerald-300",
-  pengajian: "bg-emerald-600 dark:bg-emerald-300",
-  event: "bg-emerald-600 dark:bg-emerald-300",
-  belajar: "bg-emerald-600 dark:bg-emerald-300",
-  ramadhan: "bg-emerald-600 dark:bg-emerald-300"
+/**
+ * -------------------------
+ * HELPERS
+ * -------------------------
+ */
+
+/**
+ * Convert Strapi block content (array of blocks) into a plain markdown/text string.
+ * Handles arrays like: [{ type: 'paragraph', children: [{ text: '...' }] }, ...]
+ */
+const convertBlockToText = (blocks: any): string => {
+  if (!blocks) return "Tidak ada deskripsi";
+  if (typeof blocks === "string") return blocks;
+
+  if (!Array.isArray(blocks)) return String(blocks);
+
+  return blocks
+    .map((b) => {
+      // If block has children with text
+      if (Array.isArray(b.children)) {
+        return b.children
+          .map((c: any) => (c?.text ? String(c.text) : ""))
+          .join("");
+      }
+      // If block is simple
+      if (typeof b === "string") return b;
+      // Fallback: stringify
+      return "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
 };
 
-const categoryIcons = {
-  sholat: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
-  pengajian: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
-  event: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
-  belajar: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />,
-  ramadhan: <Info className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
+/**
+ * Safe function to normalize category value into CategoryType
+ */
+const normalizeCategory = (raw?: any): CategoryType => {
+  const cat = typeof raw === "string" ? raw.toLowerCase() : "event";
+  const allowed = Object.keys(categoryColors) as CategoryType[];
+  return allowed.includes(cat as CategoryType)
+    ? (cat as CategoryType)
+    : "event";
 };
 
-const categoryBackgrounds = {
-  sholat: "bg-emerald-100 dark:bg-emerald-900",
-  pengajian: "bg-emerald-100 dark:bg-emerald-900",
-  event: "bg-emerald-100 dark:bg-emerald-900",
-  belajar: "bg-emerald-100 dark:bg-emerald-900",
-  ramadhan: "bg-emerald-100 dark:bg-emerald-900"
-};
+/**
+ * -------------------------
+ * UI: Loading & Error
+ * -------------------------
+ */
 
-const GoogleLikeLoading = () => {
-  return (
-    <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
-      <div className="relative w-20 h-20 mb-6">
-        <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30 animate-ping"></div>
-        <div className="absolute inset-2 rounded-full bg-emerald-200 dark:bg-emerald-800/50 animate-pulse"></div>
-        <CalendarDays className="absolute inset-4 w-12 h-12 text-emerald-600 dark:text-emerald-400 animate-bounce" />
-      </div>
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
-        <div className="bg-emerald-600 h-2.5 rounded-full animate-progress" style={{ width: '70%' }}></div>
-      </div>
-      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Memuat Agenda</h3>
-      <p className="text-gray-500 dark:text-gray-400 text-sm">Sedang mengambil data kegiatan...</p>
+const GoogleLikeLoading: React.FC = () => (
+  <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
+    <div className="relative w-20 h-20 mb-6">
+      <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30 animate-ping" />
+      <div className="absolute inset-2 rounded-full bg-emerald-200 dark:bg-emerald-800/50 animate-pulse" />
+      <CalendarDays className="absolute inset-4 w-12 h-12 text-emerald-600 dark:text-emerald-400 animate-bounce" />
     </div>
-  );
-};
-
-const GoogleLikeError = ({ error, onRetry }: { error: string, onRetry: () => void }) => {
-  return (
-    <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
-      <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
-        <div className="relative">
-          <X className="w-12 h-12 text-red-600 dark:text-red-400" />
-          <div className="absolute inset-0 rounded-full bg-red-200 dark:bg-red-800/30 animate-ping opacity-75"></div>
-        </div>
-      </div>
-      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Gagal Memuat Agenda</h3>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">{error}</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors flex items-center shadow-sm"
-      >
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-        Coba Lagi
-      </button>
+    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+      <div
+        className="bg-emerald-600 h-2.5 rounded-full"
+        style={{ width: "70%" }}
+      />
     </div>
-  );
-};
+    <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
+      Memuat Agenda
+    </h3>
+    <p className="text-gray-500 dark:text-gray-400 text-sm">
+      Sedang mengambil data kegiatan...
+    </p>
+  </div>
+);
+
+const GoogleLikeError: React.FC<{ error: string; onRetry: () => void }> = ({
+  error,
+  onRetry,
+}) => (
+  <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto">
+    <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
+      <X className="w-12 h-12 text-red-600 dark:text-red-400" />
+    </div>
+    <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
+      Gagal Memuat Agenda
+    </h3>
+    <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">
+      {error}
+    </p>
+    <button
+      onClick={onRetry}
+      className="px-6 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700"
+    >
+      Coba Lagi
+    </button>
+  </div>
+);
+
+/**
+ * -------------------------
+ * COMPONENT
+ * -------------------------
+ */
 
 export default function Agenda() {
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<AgendaItem | null>(null);
 
@@ -97,52 +175,92 @@ export default function Agenda() {
     const fetchAgendaItems = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agenda?populate=*`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch agenda items');
+        setError(null);
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/kegiatans?populate=*`,
+        );
+        if (!res.ok)
+          throw new Error(`HTTP ${res.status} - Gagal mengambil data`);
+
+        const data = await res.json();
+
+        if (!data?.data || !Array.isArray(data.data)) {
+          throw new Error("Response API tidak berformat { data: [...] }");
         }
-        const data = await response.json();
 
-        const formattedItems = data.data.map((item: any) => {
-          const category = item.attributes.tag_kegiatan?.toLowerCase() || 'event';
-          const normalizedCategory = Object.keys(categoryColors).includes(category) 
-            ? category 
-            : 'event';
+        const formatted: AgendaItem[] = data.data.map((item: any) => {
+          // API kamu: item langsung berisi fields (bukan item.attributes)
+          const category = normalizeCategory(item.tag_kegiatan);
 
-          const startDate = new Date(item.attributes.tanggal_mulai);
-          const endDate = new Date(item.attributes.tanggal_selesai || item.attributes.tanggal_mulai);
+          const startDateRaw = item.tanggal_mulai;
+          const endDateRaw = item.tanggal_selesai || item.tanggal_mulai;
+
+          const startDateObj = new Date(startDateRaw);
+          const endDateObj = new Date(endDateRaw);
+
+          const startDate = isNaN(startDateObj.getTime())
+            ? "Tanggal tidak valid"
+            : startDateObj.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              });
+
+          const endDate = isNaN(endDateObj.getTime())
+            ? "Tanggal tidak valid"
+            : endDateObj.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              });
+
+          const startTime = isNaN(startDateObj.getTime())
+            ? ""
+            : startDateObj.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+          const endTime = isNaN(endDateObj.getTime())
+            ? ""
+            : endDateObj.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+          const desc = convertBlockToText(item.deskripsi);
+
+          const catColor =
+            (categoryBackgrounds as Record<string, string>)[category] ||
+            "bg-white";
+          const catIcon = (categoryIcons as Record<string, JSX.Element>)[
+            category
+          ] || <Info />;
 
           return {
-            id: item.id.toString(),
-            title: item.attributes.judul,
-            startDate: startDate.toLocaleDateString('id-ID', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            }),
-            endDate: endDate.toLocaleDateString('id-ID', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            }),
-            description: item.attributes.deskripsi || 'Tidak ada deskripsi',
-            location: item.attributes.lokasi || 'Lokasi tidak ditentukan',
-            category: normalizedCategory,
-            color: categoryBackgrounds[normalizedCategory as keyof typeof categoryBackgrounds],
-            icon: categoryIcons[normalizedCategory as keyof typeof categoryIcons],
-            startTime: startDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-            endTime: endDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-            rawStartDate: item.attributes.tanggal_mulai,
-            rawEndDate: item.attributes.tanggal_selesai || item.attributes.tanggal_mulai
+            id: String(item.id ?? Math.random().toString(36).slice(2, 9)),
+            title: String(item.judul ?? "Tanpa Judul"),
+            startDate,
+            endDate,
+            description: desc,
+            location: String(item.lokasi ?? "Lokasi tidak ditentukan"),
+            category,
+            color: catColor,
+            icon: catIcon,
+            startTime,
+            endTime,
+            rawStartDate: startDateRaw,
+            rawEndDate: endDateRaw,
           };
         });
 
-        setAgendaItems(formattedItems);
+        setAgendaItems(formatted);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        console.error('Error fetching agenda items:', err);
+        console.error("fetchAgendaItems error:", err);
+        setError(err instanceof Error ? err.message : "Terjadi kesalahan");
       } finally {
         setLoading(false);
       }
@@ -151,74 +269,67 @@ export default function Agenda() {
     fetchAgendaItems();
   }, []);
 
+  // EXPORT ICS
   const exportToCalendar = (event?: AgendaItem) => {
     const eventsToExport = event ? [event] : agendaItems;
-    
     if (eventsToExport.length === 0) return;
 
-    // Format untuk iCalendar (.ics)
-    let icsContent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Masjid Khoirul Ba\'i//Agenda Kegiatan//EN',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH'
+    const ics: string[] = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Masjid Khoirul Ba'i//Agenda Kegiatan//EN",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
     ];
 
-    eventsToExport.forEach(item => {
-      if (!item.rawStartDate) return;
+    const formatDate = (dStr?: string) => {
+      if (!dStr) return "";
+      const d = new Date(dStr);
+      if (isNaN(d.getTime())) return "";
+      return d
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}/, "");
+    };
 
-      try {
-        const startDate = new Date(item.rawStartDate);
-        const endDate = new Date(item.rawEndDate || item.rawStartDate);
-        
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-          console.error(`Invalid date for event ${item.id}`);
-          return;
-        }
+    eventsToExport.forEach((it) => {
+      const dtStart = formatDate(it.rawStartDate);
+      const dtEnd = formatDate(it.rawEndDate);
+      if (!dtStart || !dtEnd) return;
 
-        const formatDate = (date: Date) => {
-          return date.toISOString()
-            .replace(/[-:]/g, '')
-            .replace(/\.\d{3}/, '');
-        };
-
-        const formattedStart = formatDate(startDate);
-        const formattedEnd = formatDate(endDate);
-        const now = formatDate(new Date());
-        
-        icsContent.push(
-          'BEGIN:VEVENT',
-          `UID:${item.id}@khoirulbai.sch.id`,
-          `DTSTAMP:${now}`,
-          `DTSTART:${formattedStart}`,
-          `DTEND:${formattedEnd}`,
-          `SUMMARY:${item.title}`,
-          `DESCRIPTION:${item.description.replace(/\n/g, '\\n')}\\n\\nLokasi: ${item.location}`,
-          `LOCATION:${item.location}`,
-          `CATEGORIES:${item.category}`,
-          'END:VEVENT'
-        );
-      } catch (err) {
-        console.error(`Error processing event ${item.id}:`, err);
-      }
+      ics.push(
+        "BEGIN:VEVENT",
+        `UID:${it.id}@khoirulbai.sch.id`,
+        `DTSTAMP:${formatDate(new Date().toISOString())}`,
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        `SUMMARY:${it.title}`,
+        `DESCRIPTION:${it.description.replace(/\n/g, "\\n")}`,
+        `LOCATION:${it.location}`,
+        `CATEGORIES:${it.category}`,
+        "END:VEVENT",
+      );
     });
 
-    icsContent.push('END:VCALENDAR');
+    ics.push("END:VCALENDAR");
 
-    const blob = new Blob([icsContent.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const blob = new Blob([ics.join("\r\n")], {
+      type: "text/calendar;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', event 
-      ? `agenda-${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics` 
-      : 'agenda-khoirulbai.ics');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = event
+      ? `agenda-${event.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.ics`
+      : "agenda-khoirulbai.ics";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
+  // RENDER
   if (loading) {
     return (
       <section className="container mx-auto px-4 py-12">
@@ -230,78 +341,78 @@ export default function Agenda() {
   if (error) {
     return (
       <section className="container mx-auto px-4 py-12">
-        <GoogleLikeError error={error} onRetry={() => window.location.reload()} />
+        <GoogleLikeError
+          error={error}
+          onRetry={() => window.location.reload()}
+        />
       </section>
     );
   }
 
   return (
     <>
-      {/* Header Section */}
+      {/* Header */}
       <section className="relative bg-emerald-700 text-white py-12 md:py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>
         <div className="container mx-auto px-4 relative">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center text-white/80 hover:text-white mb-4 transition-colors"
           >
             <ArrowLeft className="mr-2 h-5 w-5" /> Kembali ke Beranda
           </Link>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+
+          <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2 flex items-center">
-              <CalendarDays className="mr-3 h-8 w-8" />
-              Agenda Kegiatan Masjid
+              <CalendarDays className="mr-3 h-8 w-8" /> Agenda Kegiatan Masjid
             </h1>
             <p className="text-lg md:text-xl text-white/90">
               Jadwal lengkap kegiatan di Masjid Khoirul Ba'i STM ADB
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
+      {/* Content */}
       <section className="container mx-auto px-4 py-8 md:py-12 relative">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
-        >
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white">Daftar Kegiatan</h2>
-            <p className="text-gray-600 dark:text-gray-400">Pilih kegiatan untuk melihat detail lengkap</p>
+            <h2 className="text-2xl font-bold dark:text-white">
+              Daftar Kegiatan
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Pilih kegiatan untuk melihat detail lengkap
+            </p>
           </div>
+
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <Link 
-              href="/agenda/lengkap" 
+            <Link
+              href="/agenda/lengkap"
               className="flex items-center justify-center px-4 py-2 text-emerald-600 dark:text-emerald-400 hover:underline border border-emerald-600 dark:border-emerald-400 rounded-lg"
             >
               Lihat semua <ChevronRight className="ml-1" />
             </Link>
+
             <button
               onClick={() => exportToCalendar()}
               disabled={agendaItems.length === 0}
-              className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-                agendaItems.length === 0
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700'
-              }`}
+              className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors ${agendaItems.length === 0 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-emerald-600 text-white hover:bg-emerald-700"}`}
             >
               <Plus className="w-5 h-5 mr-1" /> Ekspor Semua
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {agendaItems.length === 0 ? (
           <div className="text-center py-12 rounded-2xl bg-white dark:bg-gray-800 shadow-sm max-w-md mx-auto p-8">
             <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
               <CalendarDays className="text-gray-400" size={40} />
             </div>
-            <h3 className="text-lg font-medium dark:text-white">Belum ada agenda tersedia</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Agenda kegiatan akan ditampilkan di sini</p>
+            <h3 className="text-lg font-medium dark:text-white">
+              Belum ada agenda tersedia
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
+              Agenda kegiatan akan ditampilkan di sini
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -310,37 +421,43 @@ export default function Agenda() {
                 key={event.id}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ 
-                  duration: 0.3, 
-                  delay: index * 0.1,
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.06,
                   type: "spring",
-                  stiffness: 100
+                  stiffness: 100,
                 }}
                 className={`relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 group ${event.color}`}
               >
                 <div className="absolute top-4 right-4 flex items-center gap-1">
-                  <span className={`text-xs px-2 py-1 rounded-full ${categoryColors[event.category as keyof typeof categoryColors]} text-white`}>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${(categoryColors as Record<string, string>)[event.category]} text-white`}
+                  >
                     {event.category}
                   </span>
                 </div>
-                
+
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="p-3 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
                       {event.icon}
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold dark:text-white">{event.title}</h2>
+                      <h2 className="text-xl font-bold dark:text-white">
+                        {event.title}
+                      </h2>
                       <div className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                         <ReactMarkdown>{event.description}</ReactMarkdown>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3 mt-4">
                     <div className="flex items-center">
                       <CalendarDays className="h-5 w-5 text-gray-600 dark:text-gray-300 mr-2" />
-                      <span className="dark:text-white text-sm">{event.startDate}</span>
+                      <span className="dark:text-white text-sm">
+                        {event.startDate}
+                      </span>
                     </div>
                     <div className="flex items-center">
                       <Clock className="h-5 w-5 text-gray-600 dark:text-gray-300 mr-2" />
@@ -350,18 +467,21 @@ export default function Agenda() {
                     </div>
                     <div className="flex items-center">
                       <MapPin className="h-5 w-5 text-gray-600 dark:text-gray-300 mr-2" />
-                      <span className="dark:text-white text-sm">{event.location}</span>
+                      <span className="dark:text-white text-sm">
+                        {event.location}
+                      </span>
                     </div>
                   </div>
 
                   <div className="mt-6 flex justify-between items-center">
-                    <button 
+                    <button
                       onClick={() => setSelectedItem(event)}
                       className="text-sm flex items-center text-emerald-600 dark:text-emerald-400 hover:underline"
                     >
                       Detail kegiatan <ChevronRight className="ml-1 h-4 w-4" />
                     </button>
-                    <button 
+
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         exportToCalendar(event);
@@ -377,6 +497,7 @@ export default function Agenda() {
           </div>
         )}
 
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -385,9 +506,12 @@ export default function Agenda() {
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h3 className="text-xl font-bold dark:text-white mb-2">Tidak menemukan kegiatan yang sesuai?</h3>
+              <h3 className="text-xl font-bold dark:text-white mb-2">
+                Tidak menemukan kegiatan yang sesuai?
+              </h3>
               <p className="text-gray-700 dark:text-gray-300">
-                Anda bisa mengajukan kegiatan baru atau melihat semua agenda di arsip kami.
+                Anda bisa mengajukan kegiatan baru atau melihat semua agenda di
+                arsip kami.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -407,7 +531,7 @@ export default function Agenda() {
           </div>
         </motion.div>
 
-        {/* Overlay for detail view */}
+        {/* Modal */}
         <AnimatePresence>
           {selectedItem && (
             <motion.div
@@ -431,11 +555,15 @@ export default function Agenda() {
                         <Info className="w-8 h-8" />
                       </div>
                       <div>
-                        <h1 className="text-2xl font-bold">{selectedItem.title}</h1>
-                        <p className="text-emerald-100">{selectedItem.category}</p>
+                        <h1 className="text-2xl font-bold">
+                          {selectedItem.title}
+                        </h1>
+                        <p className="text-emerald-100">
+                          {selectedItem.category}
+                        </p>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setSelectedItem(null)}
                       className="p-2 rounded-full hover:bg-white/20 transition-colors"
                     >
@@ -451,11 +579,15 @@ export default function Agenda() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-lg p-4">
-                      <h3 className="font-medium text-lg mb-3 dark:text-white">Detail Waktu</h3>
+                      <h3 className="font-medium text-lg mb-3 dark:text-white">
+                        Detail Waktu
+                      </h3>
                       <div className="space-y-2">
                         <div className="flex items-center">
                           <CalendarDays className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
-                          <span className="dark:text-white">{selectedItem.startDate}</span>
+                          <span className="dark:text-white">
+                            {selectedItem.startDate}
+                          </span>
                         </div>
                         <div className="flex items-center">
                           <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
@@ -467,16 +599,20 @@ export default function Agenda() {
                     </div>
 
                     <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-lg p-4">
-                      <h3 className="font-medium text-lg mb-3 dark:text-white">Lokasi</h3>
+                      <h3 className="font-medium text-lg mb-3 dark:text-white">
+                        Lokasi
+                      </h3>
                       <div className="flex items-center">
                         <MapPin className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mr-2" />
-                        <span className="dark:text-white">{selectedItem.location}</span>
+                        <span className="dark:text-white">
+                          {selectedItem.location}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex justify-end gap-3">
-                    <button 
+                    <button
                       onClick={() => exportToCalendar(selectedItem)}
                       className="px-4 py-2 border border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors flex items-center"
                     >
@@ -495,3 +631,4 @@ export default function Agenda() {
     </>
   );
 }
+
