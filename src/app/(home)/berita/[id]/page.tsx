@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   Clock,
@@ -168,7 +169,8 @@ const NewsImage = ({
   );
 };
 
-const BeritaDetails = ({ params }: { params: { id: string } }) => {
+const BeritaDetails = () => {
+  const params = useParams<{ id: string }>();
   const [berita, setBerita] = useState<BeritaItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [relatedNews, setRelatedNews] = useState<any[]>([]);
@@ -182,7 +184,7 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
 
-    if (params) {
+    if (params && params.id) {
       setSlug(params.id);
       fetchData(params.id);
     }
@@ -205,7 +207,7 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
       console.log("API Response for detail:", newsData);
 
       if (newsData.data.length > 0) {
-        const newsItem = newsData.data[0].attributes;
+        const newsItem = newsData.data[0].attributes || newsData.data[0];
 
         // Gunakan fungsi getImageUrl yang sama dengan halaman berita
         const imageUrl = getImageUrl(newsItem.image);
@@ -262,7 +264,7 @@ const BeritaDetails = ({ params }: { params: { id: string } }) => {
           const relatedData = await relatedResponse.json();
 
           const formattedRelated = relatedData.data.map((item: any) => {
-            const attrs = item.attributes;
+            const attrs = item.attributes || item;
             const relatedImageUrl = getImageUrl(attrs.image);
 
             return {
