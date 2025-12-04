@@ -7,6 +7,29 @@ import { useEffect, useState } from 'react';
 import { GalleryItem } from '@/app/types';
 import { GalleryItemComponent } from '@/app/components/Section/GalleryItem';
 
+function getImageUrl(img: any) {
+    const BASE = process.env.NEXT_PUBLIC_IMAGE_URL;
+
+    if (!img) return null;
+
+    if (img.url) {
+    return img.url.startsWith("http")
+        ? img.url
+        : `${BASE}${img.url}`;
+    }
+
+    if (img.formats?.large?.url)
+    return `${BASE}${img.formats.large.url}`;
+    if (img.formats?.medium?.url)
+    return `${BASE}${img.formats.medium.url}`;
+    if (img.formats?.small?.url)
+    return `${BASE}${img.formats.small.url}`;
+    if (img.formats?.thumbnail?.url)
+    return `${BASE}${img.formats.thumbnail.url}`;
+
+    return null;
+}
+
 export const Gallery = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,27 +46,21 @@ export const Gallery = () => {
         const data = await response.json();
         
         const formattedItems = data.data.map((item: any) => {
-          let imageUrl = '/placeholder.jpg';
-          if (item.attributes.gambar?.data?.attributes?.url) {
-            if (item.attributes.gambar.data.attributes.url.startsWith('http')) {
-              imageUrl = item.attributes.gambar.data.attributes.url;
-            } else {
-              imageUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.attributes.gambar.data.attributes.url}`;
-            }
-          }
+          const attributes = item.attributes || item;
+          const imageUrl = getImageUrl(attributes.gambar);
 
           return {
             id: item.id.toString(),
-            type: item.attributes.type === 'Video' ? 'video' : 'image',
-            title: item.attributes.judul,
-            description: item.attributes.deskripsi,
-            date: new Date(item.attributes.tanggal).toLocaleDateString('id-ID', {
+            type: attributes.type === 'Video' ? 'video' : 'image',
+            title: attributes.judul,
+            description: attributes.deskripsi,
+            date: new Date(attributes.tanggal).toLocaleDateString('id-ID', {
               day: 'numeric',
               month: 'long',
               year: 'numeric'
             }),
-            image: imageUrl,
-            category: item.attributes.type,
+            image: imageUrl || '/placeholder.jpg',
+            category: attributes.type,
             liked: false
           };
         });
