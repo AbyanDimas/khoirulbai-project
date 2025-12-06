@@ -1,23 +1,29 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: "standalone",
+
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
-    // ignoreBuildErrors: true,
+    // ignoreBuildErrors: true, // jangan aktifkan di production
   },
+
+  // ✅ PROXY HTTPS → HTTP (SOLUSI MIXED CONTENT)
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://202.65.116.9:1337/api/:path*",
+      },
+    ];
+  },
+
+  // ✅ IZINKAN GAMBAR DARI STRAPI IP KAMU
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "honest-bird-099a257597.media.strapiapp.com",
-      },
-      {
-        protocol: "https",
-        hostname: "honest-bird-099a257597.strapiapp.com",
+        protocol: "http",
+        hostname: "202.65.116.9",
+        port: "1337",
       },
     ],
   },
