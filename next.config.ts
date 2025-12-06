@@ -1,13 +1,7 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   output: "standalone",
 
-  typescript: {
-    // ignoreBuildErrors: true, // jangan aktifkan di production
-  },
-
-  // ✅ PROXY HTTPS → HTTP (SOLUSI MIXED CONTENT)
   async rewrites() {
     return [
       {
@@ -17,7 +11,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // ✅ IZINKAN GAMBAR DARI STRAPI IP KAMU
   images: {
     remotePatterns: [
       {
@@ -29,4 +22,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
+
