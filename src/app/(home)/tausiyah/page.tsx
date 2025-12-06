@@ -61,7 +61,7 @@ const TausiyahPage = () => {
           let imageUrl = '/placeholder.jpg'
           if (item.attributes.gambar?.data?.attributes?.url) {
             const url = item.attributes.gambar.data.attributes.url;
-            imageUrl = `http://202.65.116.9:1337${url}`;
+            imageUrl = `/api/proxy${url}`;
           }
 
           return {

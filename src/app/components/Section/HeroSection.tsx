@@ -14,8 +14,7 @@ export const HeroSection = () => {
         <Image 
           src="/images/hero-bg.jpg" 
           alt="Masjid Khoirul Ba'i" 
-          layout="fill" 
-          objectFit="cover" 
+          fill
           className="absolute inset-0 object-cover opacity-50"
         />
       <div className="absolute inset-0 bg-[url('/images/masjid-pattern.svg')] opacity-10"></div>

@@ -231,7 +231,7 @@ const Berita = () => {
               }),
               slug: attributes.slug || item.id?.toString() || "no-slug",
               image: imageUrl
-                ? `http://202.65.116.9:1337${imageUrl}`
+                ? `/api/proxy${imageUrl}`
                 : undefined,
               isTrending: attributes.isTrending || Math.random() > 0.7,
               isFeatured: attributes.isFeatured || Math.random() > 0.8,

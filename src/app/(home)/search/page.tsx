@@ -110,7 +110,7 @@ const availablePages = [
     icon: <DollarSign className="w-4 h-4" />,
   },
   {
-    path: "/pengumuman",
+    path: "/pengunguman",
     name: "Pengumuman",
     description: "Pengumuman penting masjid",
     icon: <AlertCircle className="w-4 h-4" />,
@@ -223,7 +223,7 @@ function SearchPageContent() {
               },
             ],
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -247,7 +247,7 @@ function SearchPageContent() {
     ? availablePages.filter(
         (page) =>
           page.name.toLowerCase().includes(query.toLowerCase()) ||
-          page.description.toLowerCase().includes(query.toLowerCase())
+          page.description.toLowerCase().includes(query.toLowerCase()),
       )
     : [];
 
@@ -263,21 +263,21 @@ function SearchPageContent() {
     {
       name: "Jadwal",
       pages: availablePages.filter(
-        (page) => page.name.includes("Jadwal") || page.path === "/agenda"
+        (page) => page.name.includes("Jadwal") || page.path === "/agenda",
       ),
       icon: <Clock className="w-4 h-4" />,
     },
     {
       name: "Informasi",
       pages: availablePages.filter(
-        (page) => page.path === "/berita" || page.path === "/tausiyah"
+        (page) => page.path === "/berita" || page.path === "/tausiyah",
       ),
       icon: <Info className="w-4 h-4" />,
     },
     {
       name: "Keuangan",
       pages: availablePages.filter(
-        (page) => page.path === "/keuangan" || page.path === "/laporan/waqaf"
+        (page) => page.path === "/keuangan" || page.path === "/laporan/waqaf",
       ),
       icon: <DollarSign className="w-4 h-4" />,
     },
@@ -285,9 +285,13 @@ function SearchPageContent() {
       name: "Lainnya",
       pages: availablePages.filter(
         (page) =>
-          !["/agenda", "/berita", "/tausiyah", "/keuangan", "/laporan/waqaf"].includes(
-            page.path
-          ) && !page.name.includes("Jadwal")
+          ![
+            "/agenda",
+            "/berita",
+            "/tausiyah",
+            "/keuangan",
+            "/laporan/waqaf",
+          ].includes(page.path) && !page.name.includes("Jadwal"),
       ),
       icon: <BookOpen className="w-4 h-4" />,
     },
@@ -318,7 +322,7 @@ function SearchPageContent() {
 
               {/* Search Results Section - Added this */}
               {searchResults.length > 0 ? (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="mb-8"
@@ -474,7 +478,7 @@ function SearchPageContent() {
                           setActiveCategory(
                             activeCategory === category.name
                               ? null
-                              : category.name
+                              : category.name,
                           )
                         }
                         className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -592,7 +596,7 @@ function SearchPageContent() {
                             setActiveCategory(
                               activeCategory === category.name
                                 ? null
-                                : category.name
+                                : category.name,
                             )
                           }
                           className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -677,3 +681,4 @@ export default function SearchPage({
     </Suspense>
   );
 }
+
