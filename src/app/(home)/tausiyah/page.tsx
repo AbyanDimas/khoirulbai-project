@@ -48,7 +48,7 @@ const TausiyahPage = () => {
       try {
         setLoading(true)
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/tausiyahs?populate=*`
+          `/api/proxy/tausiyahs?populate=*`
         )
         
         if (!response.ok) {
@@ -60,11 +60,8 @@ const TausiyahPage = () => {
         const formattedTausiyah = data.data.map((item: any) => {
           let imageUrl = '/placeholder.jpg'
           if (item.attributes.gambar?.data?.attributes?.url) {
-            if (item.attributes.gambar.data.attributes.url.startsWith('http')) {
-              imageUrl = item.attributes.gambar.data.attributes.url
-            } else {
-              imageUrl = `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.attributes.gambar.data.attributes.url}`
-            }
+            const url = item.attributes.gambar.data.attributes.url;
+            imageUrl = `http://202.65.116.9:1337${url}`;
           }
 
           return {

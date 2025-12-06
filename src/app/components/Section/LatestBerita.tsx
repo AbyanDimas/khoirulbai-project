@@ -8,24 +8,13 @@ import { Berita } from '@/app/types';
 import { BeritaCard } from '@/app/components/Section/BeritaCard';
 
 function getImageUrl(img: any) {
-    const BASE = process.env.NEXT_PUBLIC_IMAGE_URL; // contoh: http://10.2.2.160:1337
-
     if (!img) return null;
 
-    if (img.url) {
-    return img.url.startsWith("http")
-        ? img.url
-        : `${BASE}${img.url}`;
-    }
+    const url = img.data?.attributes?.url || img.url;
 
-    if (img.formats?.large?.url)
-    return `${BASE}${img.formats.large.url}`;
-    if (img.formats?.medium?.url)
-    return `${BASE}${img.formats.medium.url}`;
-    if (img.formats?.small?.url)
-    return `${BASE}${img.formats.small.url}`;
-    if (img.formats?.thumbnail?.url)
-    return `${BASE}${img.formats.thumbnail.url}`;
+    if (url) {
+        return `http://202.65.116.9:1337${url}`;
+    }
 
     return null;
 }
@@ -40,7 +29,7 @@ export const LatestBerita = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*&sort[0]=createdAt:desc&pagination[limit]=6`
+          `/api/proxy/blogs?populate=*&sort[0]=createdAt:desc&pagination[limit]=6`
         );
         
         if (!response.ok) {

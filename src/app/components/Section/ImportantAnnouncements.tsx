@@ -16,7 +16,7 @@ export const ImportantAnnouncements = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/pengumuman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=5`,
+          `/api/proxy/pengumuman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=5`,
         );
 
         if (!response.ok) {

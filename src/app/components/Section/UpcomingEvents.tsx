@@ -22,7 +22,7 @@ export const UpcomingEvents = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/kegiatans?populate=*&sort[0]=tanggal_mulai:asc&pagination[limit]=5`,
+          `/api/proxy/kegiatans?populate=*&sort[0]=tanggal_mulai:asc&pagination[limit]=5`,
         );
 
         if (!response.ok) {

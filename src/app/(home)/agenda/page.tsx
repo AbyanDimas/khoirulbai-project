@@ -178,7 +178,7 @@ export default function Agenda() {
         setError(null);
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/kegiatans?populate=*`,
+          `/api/proxy/kegiatans?populate=*`,
         );
         if (!res.ok)
           throw new Error(`HTTP ${res.status} - Gagal mengambil data`);
