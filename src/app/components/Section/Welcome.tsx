@@ -23,8 +23,6 @@ export const WelcomeSection = () => {
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 90vw, (max-width: 1024px) 40vw, 30vw"
-                priority
-                quality={85}
               />
             </div>
             <div className="mt-4 text-center lg:text-left">

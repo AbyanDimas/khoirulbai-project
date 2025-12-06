@@ -8,15 +8,12 @@ import { Berita } from '@/app/types';
 import { BeritaCard } from '@/app/components/Section/BeritaCard';
 
 function getImageUrl(img: any) {
-    if (!img) return null;
-
-    const url = img.data?.attributes?.url || img.url;
-
-    if (url) {
-        return `http://202.65.116.9:1337${url}`;
-    }
-
-    return null;
+  if (!img) return null;
+  const url = img.data?.attributes?.url || img.url;
+  if (url) {
+    return `/api/proxy${url}`;
+  }
+  return null;
 }
 
 export const LatestBerita = () => {

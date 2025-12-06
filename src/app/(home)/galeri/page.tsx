@@ -47,7 +47,7 @@ function getImageUrl(img: any): string | null {
   const url = img.data?.attributes?.url || img.url;
 
   if (url) {
-    return `http://202.65.116.9:1337${url}`;
+    return `/api/proxy${url}`;
   }
 
   return null;
