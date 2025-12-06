@@ -60,7 +60,7 @@ export default function PengumumanPage() {
       setLoading(true);
       setRefreshing(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/pengumuman-pentings?populate=*&sort[0]=tanggal:desc`,
+        `/api/proxy/pengumuman-pentings?populate=*&sort[0]=tanggal:desc`,
       );
 
       if (!response.ok) {

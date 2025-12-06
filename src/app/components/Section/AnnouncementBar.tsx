@@ -21,7 +21,7 @@ export const AnnouncementBar = () => {
     const fetchAnnouncements = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/pengunguman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=3`
+          `/api/proxy/pengumuman-pentings?populate=*&sort[0]=tanggal:desc&pagination[limit]=3`
         );
         
         if (!response.ok) throw new Error('Gagal Memuat');
@@ -75,7 +75,7 @@ export const AnnouncementBar = () => {
         <div className="flex-1 min-w-0 flex justify-center">
           <div className="flex items-center overflow-hidden">
             <span className="truncate text-center px-2">
-              {announcement.attributes.nama}
+              {announcement?.attributes?.nama}
             </span>
           </div>
         </div>

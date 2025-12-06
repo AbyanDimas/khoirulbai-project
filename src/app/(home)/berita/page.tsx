@@ -172,13 +172,8 @@ const Berita = () => {
     const fetchBerita = async () => {
       setLoading(true);
       try {
-        console.log(
-          "Fetching data from:",
-          `${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*`,
-        );
-
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/blogs?populate=*`,
+          `/api/proxy/blogs?populate=*`,
         );
 
         if (!response.ok) {
@@ -186,7 +181,6 @@ const Berita = () => {
         }
 
         const data = await response.json();
-        console.log("API Response:", data);
 
         // Format data berdasarkan struktur API yang diberikan
         const formattedBerita = data.data.map((item: any) => {
@@ -216,32 +210,7 @@ const Berita = () => {
             }
 
             // Handle image - FIXED: Perbaikan utama di sini!
-            const imageUrl = getImageUrl(attributes.image); // FIX DI SINI
-            // let imageUrl = null;
-
-            // ==== FUNCTION URL IMAGE (gunakan dari ENV baru) ====
-            function getImageUrl(img: any) {
-              const BASE = process.env.NEXT_PUBLIC_IMAGE_URL; // contoh: http://10.2.2.160:1337
-
-              if (!img) return null;
-
-              if (img.url) {
-                return img.url.startsWith("http")
-                  ? img.url
-                  : `${BASE}${img.url}`;
-              }
-
-              if (img.formats?.large?.url)
-                return `${BASE}${img.formats.large.url}`;
-              if (img.formats?.medium?.url)
-                return `${BASE}${img.formats.medium.url}`;
-              if (img.formats?.small?.url)
-                return `${BASE}${img.formats.small.url}`;
-              if (img.formats?.thumbnail?.url)
-                return `${BASE}${img.formats.thumbnail.url}`;
-
-              return null;
-            }
+            const imageUrl = attributes.image?.data?.attributes?.url;
 
             // Buat objek berita
             const beritaItem: BeritaItem = {
@@ -261,15 +230,15 @@ const Berita = () => {
                 year: "numeric",
               }),
               slug: attributes.slug || item.id?.toString() || "no-slug",
-              image: imageUrl,
+              image: imageUrl
+                ? `http://202.65.116.9:1337${imageUrl}`
+                : undefined,
               isTrending: attributes.isTrending || Math.random() > 0.7,
               isFeatured: attributes.isFeatured || Math.random() > 0.8,
             };
 
-            console.log("Processed item:", beritaItem);
             return beritaItem;
           } catch (err) {
-            console.error("Error processing item:", err, item);
             // Return fallback item jika terjadi error
             return {
               id: item.id?.toString() || Math.random().toString(),
@@ -278,7 +247,7 @@ const Berita = () => {
               category: "Error",
               createdAt: new Date().toLocaleDateString("id-ID"),
               slug: "error",
-              image: null,
+              image: undefined,
               isTrending: false,
               isFeatured: false,
             };
@@ -290,7 +259,6 @@ const Berita = () => {
           (item: BeritaItem) => item && item.title !== "Error loading title",
         );
 
-        console.log("Valid berita:", validBerita);
         setBerita(validBerita);
         setTotalPages(Math.ceil(validBerita.length / ITEMS_PER_PAGE));
       } catch (error) {

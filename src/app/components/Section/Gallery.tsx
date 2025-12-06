@@ -8,24 +8,13 @@ import { GalleryItem } from '@/app/types';
 import { GalleryItemComponent } from '@/app/components/Section/GalleryItem';
 
 function getImageUrl(img: any) {
-    const BASE = process.env.NEXT_PUBLIC_IMAGE_URL;
-
     if (!img) return null;
 
-    if (img.url) {
-    return img.url.startsWith("http")
-        ? img.url
-        : `${BASE}${img.url}`;
-    }
+    const url = img.data?.attributes?.url || img.url;
 
-    if (img.formats?.large?.url)
-    return `${BASE}${img.formats.large.url}`;
-    if (img.formats?.medium?.url)
-    return `${BASE}${img.formats.medium.url}`;
-    if (img.formats?.small?.url)
-    return `${BASE}${img.formats.small.url}`;
-    if (img.formats?.thumbnail?.url)
-    return `${BASE}${img.formats.thumbnail.url}`;
+    if (url) {
+        return `http://202.65.116.9:1337${url}`;
+    }
 
     return null;
 }
@@ -39,7 +28,7 @@ export const Gallery = () => {
     const fetchGalleryItems = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/galeris?populate=*&pagination[limit]=8`);
+        const response = await fetch(`/api/proxy/galeris?populate=*&pagination[limit]=8`);
         if (!response.ok) {
           throw new Error('Gagal memuat galeri kegiatan');
         }

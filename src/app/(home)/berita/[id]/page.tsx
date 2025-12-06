@@ -47,45 +47,13 @@ type BeritaItem = {
 // FIX IMAGE URL FUNGSI SAMA DENGAN HALAMAN BERITA
 // ==========================
 function getImageUrl(img: any): string | null {
-  const BASE =
-    process.env.NEXT_PUBLIC_IMAGE_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    "http://localhost:1337";
-
   if (!img) return null;
 
-  // Jika img sudah memiliki url langsung
-  if (img.url) {
-    return img.url.startsWith("http") ? img.url : `${BASE}${img.url}`;
+  const url = img.data?.attributes?.url || img.url;
+
+  if (url) {
+    return `http://202.65.116.9:1337${url}`;
   }
-
-  // Jika img adalah objek dengan format nested (Strapi format)
-  if (img.data?.attributes) {
-    const attributes = img.data.attributes;
-    if (attributes.url) {
-      return attributes.url.startsWith("http")
-        ? attributes.url
-        : `${BASE}${attributes.url}`;
-    }
-
-    // Cek formats
-    if (attributes.formats) {
-      if (attributes.formats.large?.url)
-        return `${BASE}${attributes.formats.large.url}`;
-      if (attributes.formats.medium?.url)
-        return `${BASE}${attributes.formats.medium.url}`;
-      if (attributes.formats.small?.url)
-        return `${BASE}${attributes.formats.small.url}`;
-      if (attributes.formats.thumbnail?.url)
-        return `${BASE}${attributes.formats.thumbnail.url}`;
-    }
-  }
-
-  // Coba formats langsung
-  if (img.formats?.large?.url) return `${BASE}${img.formats.large.url}`;
-  if (img.formats?.medium?.url) return `${BASE}${img.formats.medium.url}`;
-  if (img.formats?.small?.url) return `${BASE}${img.formats.small.url}`;
-  if (img.formats?.thumbnail?.url) return `${BASE}${img.formats.thumbnail.url}`;
 
   return null;
 }
@@ -196,7 +164,7 @@ const BeritaDetails = () => {
 
       // Fetch main news - KONSISTEN DENGAN HALAMAN BERITA
       const newsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$eq]=${id}&populate=*`,
+        `/api/proxy/blogs?filters[slug][$eq]=${id}&populate=*`,
       );
 
       if (!newsResponse.ok) {
@@ -257,7 +225,7 @@ const BeritaDetails = () => {
 
         // Fetch related news - KONSISTEN DENGAN HALAMAN BERITA
         const relatedResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/blogs?filters[slug][$ne]=${id}&pagination[limit]=3&populate=*`,
+          `/api/proxy/blogs?filters[slug][$ne]=${id}&pagination[limit]=3&populate=*`,
         );
 
         if (relatedResponse.ok) {

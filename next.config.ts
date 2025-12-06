@@ -1,26 +1,17 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: "standalone",
+import { NextConfig } from "next";
 
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://202.65.116.9:1337/api/:path*",
-      },
-    ];
-  },
-
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: "http",
         hostname: "202.65.116.9",
         port: "1337",
+        pathname: "/uploads/**",
       },
     ],
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
 
