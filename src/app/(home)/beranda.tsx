@@ -18,7 +18,7 @@ import {
   Newspaper,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { AnnouncementBar } from "@/app/components/Section/AnnouncementBar";
+// import { AnnouncementBar } from "@/app/components/Section/AnnouncementBar";
 import { HeroSection } from "@/app/components/Section/HeroSection";
 import { InfoBar } from "@/app/components/Section/InfoBar";
 import { PrayerScheduleSection } from "@/app/components/Section/PrayerSchedule";
@@ -46,88 +46,87 @@ import type {
 import { WelcomeSection } from "../components/Section/Welcome";
 import { HomeWorkProgram } from "../components/Section/WorkProgram";
 
-
 const Beranda = () => {
   // State for current time and date
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isPlaying, setIsPlaying] = useState(false);
   const [jadwalSholat, setJadwalSholat] = useState<PrayerSchedule>({
-today: [
-  {
-    name: "Subuh",
-    time: "04:32",
-    passed: false,
-    icon: <Sunrise className="h-5 w-5" />,
-  },
-  {
-    name: "Syuruq",
-    time: "05:56",
-    passed: false,
-    icon: <Sun className="h-5 w-5" />,
-  },
-  {
-    name: "Dzuhur",
-    time: "11:47",
-    passed: false,
-    icon: <Sun className="h-5 w-5" />,
-  },
-  {
-    name: "Ashar",
-    time: "15:09",
-    passed: false,
-    icon: <CloudSun className="h-5 w-5" />,
-  },
-  {
-    name: "Maghrib",
-    time: "17:39",
-    passed: false,
-    icon: <Sunset className="h-5 w-5" />,
-  },
-  {
-    name: "Isya",
-    time: "18:54",
-    passed: false,
-    icon: <Moon className="h-5 w-5" />,
-  },
-],
-tomorrow: [
-  {
-    name: "Subuh",
-    time: "04:32",
-    passed: false,
-    icon: <Sunrise className="h-5 w-5" />,
-  },
-  {
-    name: "Syuruq",
-    time: "05:56",
-    passed: false,
-    icon: <Sun className="h-5 w-5" />,
-  },
-  {
-    name: "Dzuhur",
-    time: "11:47",
-    passed: false,
-    icon: <Sun className="h-5 w-5" />,
-  },
-  {
-    name: "Ashar",
-    time: "15:09",
-    passed: false,
-    icon: <CloudSun className="h-5 w-5" />,
-  },
-  {
-    name: "Maghrib",
-    time: "17:39",
-    passed: false,
-    icon: <Sunset className="h-5 w-5" />,
-  },
-  {
-    name: "Isya",
-    time: "18:54",
-    passed: false,
-    icon: <Moon className="h-5 w-5" />,
-  },
-],
+    today: [
+      {
+        name: "Subuh",
+        time: "04:32",
+        passed: false,
+        icon: <Sunrise className="h-5 w-5" />,
+      },
+      {
+        name: "Syuruq",
+        time: "05:56",
+        passed: false,
+        icon: <Sun className="h-5 w-5" />,
+      },
+      {
+        name: "Dzuhur",
+        time: "11:47",
+        passed: false,
+        icon: <Sun className="h-5 w-5" />,
+      },
+      {
+        name: "Ashar",
+        time: "15:09",
+        passed: false,
+        icon: <CloudSun className="h-5 w-5" />,
+      },
+      {
+        name: "Maghrib",
+        time: "17:39",
+        passed: false,
+        icon: <Sunset className="h-5 w-5" />,
+      },
+      {
+        name: "Isya",
+        time: "18:54",
+        passed: false,
+        icon: <Moon className="h-5 w-5" />,
+      },
+    ],
+    tomorrow: [
+      {
+        name: "Subuh",
+        time: "04:32",
+        passed: false,
+        icon: <Sunrise className="h-5 w-5" />,
+      },
+      {
+        name: "Syuruq",
+        time: "05:56",
+        passed: false,
+        icon: <Sun className="h-5 w-5" />,
+      },
+      {
+        name: "Dzuhur",
+        time: "11:47",
+        passed: false,
+        icon: <Sun className="h-5 w-5" />,
+      },
+      {
+        name: "Ashar",
+        time: "15:09",
+        passed: false,
+        icon: <CloudSun className="h-5 w-5" />,
+      },
+      {
+        name: "Maghrib",
+        time: "17:39",
+        passed: false,
+        icon: <Sunset className="h-5 w-5" />,
+      },
+      {
+        name: "Isya",
+        time: "18:54",
+        passed: false,
+        icon: <Moon className="h-5 w-5" />,
+      },
+    ],
   });
 
   // Update current time every second
@@ -163,7 +162,6 @@ tomorrow: [
     icon: <CloudSun className="h-8 w-8 text-yellow-500" />,
   };
 
-
   // Update prayer times status based on current time
   useEffect(() => {
     const timer = setInterval(() => {
@@ -184,18 +182,18 @@ tomorrow: [
       });
     };
 
-    setJadwalSholat(prev => ({
+    setJadwalSholat((prev) => ({
       today: updateTimes(prev.today),
-      tomorrow: updateTimes(prev.tomorrow)
+      tomorrow: updateTimes(prev.tomorrow),
     }));
   }, [currentTime]);
 
   // Find next prayer
   const getNextPrayer = () => {
     const now = currentTime.getHours() * 60 + currentTime.getMinutes();
-    
+
     // Cari di jadwal hari ini
-    const nextToday = jadwalSholat.today.find(prayer => {
+    const nextToday = jadwalSholat.today.find((prayer) => {
       const [hours, minutes] = prayer.time.split(":").map(Number);
       const prayerTime = hours * 60 + minutes;
       return now < prayerTime;
@@ -206,7 +204,6 @@ tomorrow: [
   };
 
   const nextPrayer = getNextPrayer();
-
 
   // Agenda Terdekat
   const upcomingEvents: Event[] = [
@@ -318,7 +315,6 @@ tomorrow: [
     },
   ];
 
-
   // Statistik Masjid
   const stats: StatItem[] = [
     {
@@ -345,7 +341,7 @@ tomorrow: [
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <AnnouncementBar />
+      {/* <AnnouncementBar /> */}
       <HeroSection />
       <InfoBar
         currentTime={currentTime}
@@ -373,12 +369,12 @@ tomorrow: [
         </motion.div>
       </section>
 
-<WelcomeSection />
-<div className="container mx-auto px-4 py-12">
-      <ImportantAnnouncements />
-</div>
+      <WelcomeSection />
       <div className="container mx-auto px-4 py-12">
-      <MosqueStats stats={stats} />
+        <ImportantAnnouncements />
+      </div>
+      <div className="container mx-auto px-4 py-12">
+        <MosqueStats stats={stats} />
       </div>
       <MosqueServices services={services} />
       <HomeWorkProgram />
