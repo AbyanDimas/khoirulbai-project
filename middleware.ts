@@ -1,15 +1,14 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('jwt')?.value
-  const { pathname } = request.nextUrl
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-  // 1. User sudah login, tidak boleh ke halaman auth
-  const isAuthPage = pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')
-  if (token && isAuthPage) {
-    return NextResponse.redirect(new URL('/', request.url))
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
+
+export default clerkMiddleware((auth, request) => {
+  if(!isPublicRoute(request)) {
+    auth().protect();
   }
+});
 
-  return NextResponse.next()
-}
+export const config = {
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+};

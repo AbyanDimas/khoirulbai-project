@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const STRAPI_BASE_URL = "http://202.65.116.9:1337/";
-const STRAPI_API_URL = "http://202.65.116.9:1337/api/";
+const STRAPI_BASE_URL = process.env.STRAPI_BASE_URL;
+const STRAPI_API_URL = process.env.STRAPI_API_URL;
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
+  context: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await context.params;
   const { search } = request.nextUrl;
@@ -31,10 +31,7 @@ export async function GET(
 
     const buffer = await response.arrayBuffer();
     const headers = new Headers(response.headers);
-    headers.set(
-      "Content-Type",
-      contentType || "application/octet-stream"
-    );
+    headers.set("Content-Type", contentType || "application/octet-stream");
 
     return new NextResponse(buffer, {
       status: response.status,
@@ -47,7 +44,7 @@ export async function GET(
     }
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -98,7 +98,7 @@ function parseRichTextContent(content: any): string {
 // ==========================
 // IMAGE COMPONENT
 // ==========================
-const NewsImage = ({
+  const NewsImage = ({
   src,
   alt,
   className = "",
@@ -116,7 +116,7 @@ const NewsImage = ({
       </div>
     );
   }
-
+  console.log(src);
   const handleImageError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>,
   ) => {
@@ -136,7 +136,6 @@ const NewsImage = ({
     />
   );
 };
-
 const BeritaDetails = () => {
   const params = useParams<{ id: string }>();
   const [berita, setBerita] = useState<BeritaItem | null>(null);
